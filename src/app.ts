@@ -5,7 +5,7 @@ import session from 'express-session';
 import path from 'path';
 import routesClinicas from './routes/clinica.routes';
 import Pet_routes from './routes/pet.routes';
-import { swaggerSpec, swaggerUi } from '../swagger';
+import { swaggerSpec, swaggerUi } from './swagger';
 
 const app = express()
 

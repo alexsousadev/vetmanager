@@ -90,8 +90,16 @@ router.post("/cadastro", async (req: Request, res: Response) => {
 });
 
 
+
 router.get("/dashboard", userAuth, (req: Request, res: Response)=> {
     res.sendFile(path.join(__dirname, "../../public/dashboard.html")); 
+
+
+router.get("/dashboard", userAuth, (req: Request, res: Response) => {
+    // res.sendFile(); --> é aqui onde vai colocar o html do dashboard
+
 })
+
+
 
 export default router;

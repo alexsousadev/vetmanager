@@ -3,6 +3,8 @@ import bodyParser from 'body-parser';
 import userRoutes from './src/routes/user.routes';
 import session from 'express-session';
 import path from 'path';
+import routesClinicas from './src/routes/clinica.routes';
+import Pet_routes from './src/routes/pet.routes';
 const app = express()
 
 const PORT = process.env.PORT || 3000;
@@ -18,17 +20,32 @@ app.use(session({
     }
 }));
 
+
 app.use(express.json())
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use("/clinicas", routesClinicas);
+app.use(express.json());
+app.use(bodyParser.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, 'public')));
+app.use(Pet_routes);
 
 // Rota principal
 app.get("/", (req: Request, res: Response) => {
+
     res.sendFile(path.join(__dirname, "/public/home.html")); 
 })
 
 app.use("/", userRoutes);
+
+    res.json({message:"Hello world!"})
+})
+
+
+app.use(userRoutes)
+
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`)

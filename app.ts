@@ -19,12 +19,12 @@ app.use(session({
     }
 }));
 
-app.use("/clinicas", routesClinicas);
 
 app.use(express.json())
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use("/clinicas", routesClinicas);
 
 // Rota principal
 app.get("/", (req: Request, res: Response) => {

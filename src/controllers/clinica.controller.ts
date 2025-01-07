@@ -25,41 +25,39 @@ export const listarClinicas = async (req: Request, res: Response) => {
 
 export const cadastrarClinica = async (req: Request, res: Response) => {
     try {
+        console.log("Dados recebidos no body:", req.body);
+
         const { 
             nome_clinica, 
             endereco_clinica,
             telefone_clinica,
             foto_clinica,
             avaliacao_clinica,
-            total_avaliacoes
+            total_avaliacoes,
         } = req.body;
 
-        if (
-            !nome_clinica ||
-            !endereco_clinica ||
-            !telefone_clinica ||
-            !foto_clinica ||
-            !avaliacao_clinica ||
-            total_avaliacoes === undefined
-        ) {
+        if (!nome_clinica || !endereco_clinica || !telefone_clinica || !foto_clinica || !avaliacao_clinica || total_avaliacoes === undefined) {
+            console.log("Erro de validação: Campos obrigatórios ausentes");
             return res.status(400).json({
-                message: "Todos os campos são obrigatórios: nome_clinica, endereco_clinica, telefone_clinica, foto_clinica, avaliacao_clinica, total_avaliacoes.",
+            message: "Todos os campos são obrigatórios.",
             });
         }
 
         const novaClinica = await prisma.clinica.create({
             data: {
-                nome_clinica,
-                endereco_clinica,
-                telefone_clinica,
-                foto_clinica,
-                avaliacao_clinica,
-                total_avaliacoes,
+            nome_clinica,
+            endereco_clinica,
+            telefone_clinica,
+            foto_clinica,
+            avaliacao_clinica,
+            total_avaliacoes,
             },
         });
 
+        console.log("Clínica cadastrada com sucesso:", novaClinica);
         return res.status(201).json(novaClinica);
     } catch (error) {
+        console.error("Erro ao cadastrar clínica:", error);
         return res.status(500).json({ message: "Erro ao cadastrar clínica", error });
     }
 };

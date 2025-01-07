@@ -5,10 +5,15 @@ import session from 'express-session';
 import path from 'path';
 import routesClinicas from './src/routes/clinica.routes';
 import Pet_routes from './src/routes/pet.routes';
+import { swaggerSpec, swaggerUi } from './swagger';
+
 const app = express()
 
 const PORT = process.env.PORT || 3000;
 const JWT_KEY = process.env.JWT_SECRET_KEY || 'secret dog';
+
+
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // configuração da sessão
 app.use(session({
@@ -25,20 +30,19 @@ app.use(express.json())
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
-app.use("/clinicas", routesClinicas);
-app.use(express.json());
-app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(Pet_routes);
+
+app.use("/users",userRoutes)
+app.use("/pets", Pet_routes);
+app.use("/clinicas", routesClinicas);
 
 // Rota principal
 app.get("/", (req: Request, res: Response) => {
-    res.json({message:"Hello world!"})
+    res.sendFile(path.join(__dirname, "/public/home.html"))
 })
 
 
-app.use(userRoutes)
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`)

@@ -34,11 +34,18 @@ app.use(Pet_routes);
 
 // Rota principal
 app.get("/", (req: Request, res: Response) => {
+
+    res.sendFile(path.join(__dirname, "/public/home.html")); 
+})
+
+app.use("/", userRoutes);
+
     res.json({message:"Hello world!"})
 })
 
 
 app.use(userRoutes)
+
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`)

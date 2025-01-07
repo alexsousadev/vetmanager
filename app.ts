@@ -4,6 +4,7 @@ import userRoutes from './src/routes/user.routes';
 import session from 'express-session';
 import path from 'path';
 import routesClinicas from './src/routes/clinica.routes';
+import Pet_routes from './src/routes/pet.routes';
 const app = express()
 
 const PORT = process.env.PORT || 3000;
@@ -25,6 +26,11 @@ app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use("/clinicas", routesClinicas);
+app.use(express.json());
+app.use(bodyParser.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, 'public')));
+app.use(Pet_routes);
 
 // Rota principal
 app.get("/", (req: Request, res: Response) => {

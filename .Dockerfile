@@ -2,7 +2,7 @@
 FROM node:20.9.0
 
 # Define o diretório de trabalho dentro do container
-WORKDIR /
+WORKDIR /usr/src/app
 
 # Copia os arquivos de configuração e dependências do projeto para o container
 COPY package.json package-lock.json ./
@@ -11,7 +11,7 @@ COPY package.json package-lock.json ./
 RUN npm install
 
 # Copia todo o código do projeto para o container
-COPY . /
+COPY . .
 
 # Compila o código TypeScript para JavaScript
 RUN npm run build

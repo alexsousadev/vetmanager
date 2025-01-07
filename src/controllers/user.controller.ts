@@ -44,7 +44,6 @@ export const createUser = async (nome: string, email: string, senha: string, cpf
             cpf_usuario: cpf,
         },
     })
-
 }
 
 // geração do token

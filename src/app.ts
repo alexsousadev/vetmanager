@@ -1,11 +1,11 @@
 import express, { Response, Request } from 'express';
 import bodyParser from 'body-parser';
-import userRoutes from './src/routes/user.routes';
+import userRoutes from './routes/user.routes';
 import session from 'express-session';
 import path from 'path';
-import routesClinicas from './src/routes/clinica.routes';
-import Pet_routes from './src/routes/pet.routes';
-import { swaggerSpec, swaggerUi } from './swagger';
+import routesClinicas from './routes/clinica.routes';
+import Pet_routes from './routes/pet.routes';
+import { swaggerSpec, swaggerUi } from '../swagger';
 
 const app = express()
 
@@ -28,10 +28,8 @@ app.use(session({
 
 app.use(express.json())
 app.use(bodyParser.json());
-app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, 'public')));
 
 app.use("/users",userRoutes)
 app.use("/pets", Pet_routes);

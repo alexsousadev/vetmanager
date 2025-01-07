@@ -2,7 +2,7 @@
 FROM node:20.9.0
 
 # Define o diretório de trabalho dentro do container
-WORKDIR /usr/src/app
+WORKDIR /
 
 # Copia os arquivos de configuração e dependências do projeto para o container
 COPY package.json package-lock.json ./

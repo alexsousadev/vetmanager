@@ -11,7 +11,7 @@ COPY package.json package-lock.json ./
 RUN npm install
 
 # Copia todo o código do projeto para o container
-COPY . .
+COPY . /
 
 # Compila o código TypeScript para JavaScript
 RUN npm run build

@@ -55,3 +55,4 @@ model Avaliacao {
   clinicaId_clinica    Int
   usuarioId_usuario    Int
 }
+

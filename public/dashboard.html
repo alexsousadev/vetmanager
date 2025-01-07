@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel do Usuário</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to right, #f9f9f9, #e0e0e0);
+            color: #333;
+        }
+        .navbar {
+            background-color: rgba(76, 175, 80, 0.8);
+            overflow: hidden;
+            padding: 10px;
+        }
+        .navbar a {
+            float: left;
+            display: block;
+            color: white;
+            text-align: center;
+            padding: 14px 16px;
+            text-decoration: none;
+            font-size: 17px;
+        }
+        .navbar a:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+            color: white;
+        }
+        .container {
+            padding: 40px;
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+        }
+        .user-card {
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px auto;
+            width: 300px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+        .user-card img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+        }
+        .clinicas {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+        .clinica {
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            margin: 10px;
+            padding: 10px;
+            width: 200px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s;
+        }
+        .clinica:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+        }
+        .clinica img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+        .icon-section {
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+        }
+        .icon {
+            margin: 0 20px;
+            text-align: center;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            padding: 10px;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+        .icon:hover {
+            background-color: rgba(76, 175, 80, 0.2);
+            transform: scale(1.05);
+        }
+        .icon i {
+            font-size: 40px;
+            color: #4CAF50;
+        }
+        .icon p {
+            margin-top: 10px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <a href="/"><i class="fas fa-home"></i> Home</a>
+        <a href="/cadastro"><i class="fas fa-user-plus"></i> Cadastro</a>
+        <a href="/login"><i class="fas fa-sign-in-alt"></i> Login</a>
+    </div>
+
+    <div class="container">
+        <div class="user-card">
+            <img src="https://preview.redd.it/l0ergarfzst61.png?auto=webp&s=5de076eac09bb645d58b11cd8ce82f99ec487329" alt="Usuário">
+            <h2>Bem-vindo, <span id="user-name">Nome do Usuário</span>!</h2>
+        </div>
+        <h1>Bem-vindo ao seu Painel!</h1>
+        <p>Aqui estão algumas clínicas recomendadas:</p>
+        <div class="clinicas">
+            <div class="clinica">
+                <img src="https://lh3.googleusercontent.com/p/AF1QipNFnfIbigDwAedtlkYfzZi84rfY1s3ooYp6T5gn=s680-w680-h510" alt="Clínica 1">
+                <h3>UDVet - Unidade de Diagnóstico Veterinário</h3>
+                <p>R. Prof. Pires Gayoso, 365 - São João, Teresina, PI</p>
+            </div>
+            <div class="clinica">
+                <img src="https://lh3.googleusercontent.com/p/AF1QipOfpWUhH8NlepISCbJdwDG3sqkhWhlrN7G7vXlL=s680-w680-h510" alt="Clínica 2">
+                <h3>Dr. Pet</h3>
+                <p>Avenida Leônidas Melo, Nº 546, Bairro: Piçarra, CEP: 64015-120, Teresina/Piauí</p>
+            </div>
+            <div class="clinica">
+                <img src="https://lh3.googleusercontent.com/p/AF1QipP_n8wPiEAL_BBJoCD8FXmSmvl-nz4S0cloQ1Zm=s680-w680-h510" alt="Clínica 3">
+                <h3>Ub Pet</h3>
+                <p>R. Barroso, 1928 - Vermelha, Teresina - PI, 64018-520</p>
+            </div>
+        </div>
+
+        <!-- Seção de Ícones -->
+        <div class="icon-section">
+            <div class="icon">
+                <i class="fas fa-paw"></i>
+                <p>Meus Pets</p>
+            </div>
+            <div class="icon">
+                <i class="fas fa-map-marker-alt"></i>
+                <p>Clínicas Próximas</p>
+            </div>
+            <div class="icon">
+                <i class="fas fa-calendar-alt"></i>
+                <p>Agendar Consulta</p>
+            </div>
+            <div class="icon">
+                <i class="fas fa-user-friends"></i>
+                <p>Veterinários</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

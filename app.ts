@@ -25,10 +25,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Rota principal
 app.get("/", (req: Request, res: Response) => {
-    // res.sendFile(path.join(__dirname, '../public', 'index.html')); --> aqui é o index.html
+    res.sendFile(path.join(__dirname, "/public/home.html")); 
 })
 
-app.use(userRoutes)
+app.use("/", userRoutes);
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`)

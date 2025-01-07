@@ -17,11 +17,11 @@ const userSchema = z.object({
 type userSchema = z.infer<typeof userSchema>
 
 router.get("/login", (req: Request, res: Response) => {
-    // res.sendFile(); --> é aqui onde vai colocar o html do login
+    res.sendFile(path.join(__dirname, "../../public/login.html")); 
 });
 
 router.get("/cadastro", (req: Request, res: Response) => {
-    // res.sendFile(); --> é aqui onde vai colocar o html do cadastro
+    res.sendFile(path.join(__dirname, "../../public/cadastro.html")); 
 });
 
 router.post("/login", async (req: Request, res: Response) => {
@@ -30,26 +30,28 @@ router.post("/login", async (req: Request, res: Response) => {
         const password = req.body.password;
 
         const loginValidation = await checkLogin(email, password);
-
+        console.log(email)
+        console.log(password)
         if (loginValidation) {
             const tokenJWT = generateToken(email);
-            req.session.user = tokenJWT
-            res.redirect("/dashboard")
+            req.session.user = tokenJWT;
+            res.redirect("/dashboard");
         } else {
             res.status(401).json({ error: "Email ou senha inválidos" });
         }
     } catch (error) {
+        console.error("Erro ao fazer login:", error); // Log the specific error
 
         if (error instanceof ZodError) {
-            res.json({
+            return res.status(400).json({
                 "error": error.message
-            })
+            });
         }
 
-        res.status(500).json({ error: "Erro interno no servidor." });
-
+        return res.status(500).json({ error: "Erro interno no servidor." });
     }
 });
+
 
 router.get("/logout", (req: Request, res: Response) => {
     req.session.destroy((err) => {
@@ -65,6 +67,8 @@ router.post("/cadastro", async (req: Request, res: Response) => {
 
     try {
         const { name, email, password, cpf } = userSchema.parse(req.body)
+
+        console.log(name,email,password,cpf)
 
         const salt = genSaltSync(10);
         const hashedPassword = hashSync(password, salt);
@@ -86,8 +90,8 @@ router.post("/cadastro", async (req: Request, res: Response) => {
 });
 
 
-router.get("/dashboard", userAuth, (req: Request, res: Response) => {
-    // res.sendFile(); --> é aqui onde vai colocar o html do dashboard
+router.get("/dashboard", userAuth, (req: Request, res: Response)=> {
+    res.sendFile(path.join(__dirname, "../../public/dashboard.html")); 
 })
 
 export default router;

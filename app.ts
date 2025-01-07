@@ -3,6 +3,7 @@ import bodyParser from 'body-parser';
 import userRoutes from './src/routes/user.routes';
 import session from 'express-session';
 import path from 'path';
+import routesClinicas from './src/routes/clinica.routes';
 const app = express()
 
 const PORT = process.env.PORT || 3000;
@@ -18,6 +19,8 @@ app.use(session({
     }
 }));
 
+app.use("/clinicas", routesClinicas);
+
 app.use(express.json())
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));
@@ -25,8 +28,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Rota principal
 app.get("/", (req: Request, res: Response) => {
-    // res.sendFile(path.join(__dirname, '../public', 'index.html')); --> aqui é o index.html
+    res.json({message:"Hello world!"})
 })
+
 
 app.use(userRoutes)
 

@@ -13,6 +13,9 @@ RUN npm install
 # Instala o TypeScript globalmente para evitar erros de "tsc not found"
 RUN npm install -g typescript
 
+# Gera o Prisma Client
+RUN npx prisma generate
+
 # Copia todo o código do projeto
 COPY . .
 
@@ -23,4 +26,4 @@ RUN npm run build
 EXPOSE 3000
 
 # Comando para iniciar o servidor
-CMD ["npm", "start"]
+CMD ["node", "./dist/app.js"]

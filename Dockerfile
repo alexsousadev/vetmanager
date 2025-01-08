@@ -13,6 +13,8 @@ RUN npm install
 # Instala o TypeScript globalmente para evitar erros de "tsc not found"
 RUN npm install -g typescript
 
+COPY prisma ./prisma
+
 # Gera o Prisma Client
 RUN npx prisma generate
 

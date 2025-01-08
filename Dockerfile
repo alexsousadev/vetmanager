@@ -1,23 +1,26 @@
-# Use a imagem base do Node.js
+# Use uma imagem base do Node.js
 FROM node:20.9.0
 
 # Define o diretório de trabalho dentro do container
-WORKDIR /usr/src/app
+WORKDIR /usr/src/
 
-# Copia os arquivos de configuração e dependências do projeto para o container
+# Copia os arquivos de configuração para o container
 COPY package.json package-lock.json ./
 
-# Instala as dependências do projeto
+# Instala as dependências
 RUN npm install
 
-# Copia todo o código do projeto para o container
+# Instala o TypeScript globalmente para evitar erros de "tsc not found"
+RUN npm install -g typescript
+
+# Copia todo o código do projeto
 COPY . .
 
-# Compila o código TypeScript para JavaScript
+# Compila o TypeScript
 RUN npm run build
 
-# Expõe a porta usada pelo servidor (ajuste conforme necessário)
+# Expõe a porta usada pelo servidor
 EXPOSE 3000
 
-# Define o comando para rodar o servidor no container
+# Comando para iniciar o servidor
 CMD ["npm", "start"]

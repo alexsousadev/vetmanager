@@ -1,105 +1,82 @@
-import { Router, Request, Response } from "express";
-import { checkLogin, checkHasUser, generateToken, createUser } from "../controllers/user.controller";
-import { genSaltSync, hashSync } from 'bcrypt';
-import { userAuth } from '../middlewere/user-auth.middlewere'
-import { z, ZodError } from 'zod'
-import path from "path";
-const router = Router();
+import { Router } from "express";
+import { loginUsuario, cadastroUsuario, Dash } from "../controllers/user.controller";
+import { usuarioAuth } from "../controllers/auth.controller";
 
-// validação do input de usuário
-const userSchema = z.object({
-    name: z.string(),
-    email: z.string().email(),
-    password: z.string().min(2),
-    cpf: z.string()
-})
+const userRouter = Router();
 
-type userSchema = z.infer<typeof userSchema>
+/**
+ * @swagger
+ * tags:
+ *   name: Users
+ *   description: API para gerenciar usuários
+ */
 
-router.get("/login", (req: Request, res: Response) => {
-    res.sendFile(path.join(__dirname, "../../public/login.html")); 
-});
+/**
+ * @swagger
+ * /users/login:
+ *   post:
+ *     summary: Login de usuário
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email_usuario:
+ *                 type: string
+ *               senha_usuario:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Login bem-sucedido
+ *       401:
+ *         description: Credenciais inválidas
+ */
+userRouter.post("/login", loginUsuario)
 
-router.get("/cadastro", (req: Request, res: Response) => {
-    res.sendFile(path.join(__dirname, "../../public/cadastro.html")); 
-});
+/**
+ * @swagger
+ * /users/cadastro:
+ *   post:
+ *     summary: Cadastro de usuário
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *               cpf:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Usuário cadastrado com sucesso
+ *       409:
+ *         description: Usuário já cadastrado
+ */
+userRouter.post("/cadastro", cadastroUsuario)
 
-router.post("/login", async (req: Request, res: Response) => {
-    try {
-        const email = req.body.email;
-        const password = req.body.password;
+/**
+ * @swagger
+ * /users/dash:
+ *   get:
+ *     summary: Dashboard do usuário
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Retorna a dashboard do usuário
+ */
+userRouter.get("/dash", usuarioAuth, Dash)
 
-        const loginValidation = await checkLogin(email, password);
-        console.log(email)
-        console.log(password)
-        if (loginValidation) {
-            const tokenJWT = generateToken(email);
-            req.session.user = tokenJWT;
-            res.redirect("/dashboard");
-        } else {
-            res.status(401).json({ error: "Email ou senha inválidos" });
-        }
-    } catch (error) {
-        console.error("Erro ao fazer login:", error); // Log the specific error
-
-        if (error instanceof ZodError) {
-            return res.status(400).json({
-                "error": error.message
-            });
-        }
-
-        return res.status(500).json({ error: "Erro interno no servidor." });
-    }
-});
-
-
-router.get("/logout", (req: Request, res: Response) => {
-    req.session.destroy((err) => {
-        if (err) {
-            return res.status(500).send("Erro ao encerrar a sessão.");
-        }
-        res.redirect("/");
-    });
-});
-
-
-router.post("/cadastro", async (req: Request, res: Response) => {
-
-    try {
-        const { name, email, password, cpf } = userSchema.parse(req.body)
-
-        console.log(name,email,password,cpf)
-
-        const salt = genSaltSync(10);
-        const hashedPassword = hashSync(password, salt);
-
-        const registerValidation = await checkHasUser(email);
-        if (registerValidation) {
-            return res.status(409).json({ error: "Usuário já existe" }); // 409 Conflict
-        }
-
-        createUser(name, email, hashedPassword, cpf)
-        return res.redirect("/login")
-    } catch (error) {
-
-        if (error instanceof ZodError) {
-            return res.status(400).json({ error: "Dados de entrada inválidos" });
-        }
-        return res.status(500).json({ error: "Ocorreu um erro interno do servidor." });
-    }
-});
-
-
-
-router.get("/dashboard", userAuth, (req: Request, res: Response)=> {
-    res.sendFile(path.join(__dirname, "../../public/dashboard.html")); 
-
-
-router.get("/dashboard", userAuth, (req: Request, res: Response) => {
-    // res.sendFile(); --> é aqui onde vai colocar o html do dashboard
-
-})
-
-
-
-export default router;
+export default userRouter;

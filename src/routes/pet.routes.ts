@@ -8,7 +8,7 @@ const petRouter = Router();
  * @swagger
  * tags:
  *   name: Pets
- *   description: API para gerenciar pets
+ *   description: Gerenciamento de Pets
  */
 
 /**

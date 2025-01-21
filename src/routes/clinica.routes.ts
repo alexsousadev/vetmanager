@@ -15,7 +15,7 @@ const clinicaRouter = express.Router();
  * @swagger
  * tags:
  *   name: Clinicas
- *   description: API para gerenciar clínicas
+ *   description: Gerenciamento de Clínicas
  */
 
 
@@ -38,7 +38,7 @@ clinicaRouter.get("/", loginAuth, listarClinicas);
  * /clinicas/cadastro:
  *   post:
  *     summary: Cadastrar uma nova clínica
- *     tags: [Clinics]
+ *     tags: [Clinicas]
  *     requestBody:
  *       required: true
  *       content:
@@ -67,7 +67,7 @@ clinicaRouter.post("/cadastro", cadastrarClinica);
  * /clinicas/login:
  *   post:
  *     summary: Login de clínica
- *     tags: [Clinics]
+ *     tags: [Clinicas]
  *     requestBody:
  *       required: true
  *       content:
@@ -92,7 +92,7 @@ clinicaRouter.post("/login", loginClinica);
  * /clinicas/{id}:
  *   put:
  *     summary: Atualizar uma clínica
- *     tags: [Clinics]
+ *     tags: [Clinicas]
  *     parameters:
  *       - name: id
  *         in: path
@@ -128,7 +128,7 @@ clinicaRouter.put("/:id", loginAuth, atualizarClinica);
  * /clinicas/{id}:
  *   delete:
  *     summary: Excluir uma clínica
- *     tags: [Clinics]
+ *     tags: [Clinicas]
  *     parameters:
  *       - name: id
  *         in: path
@@ -149,7 +149,7 @@ clinicaRouter.delete("/:id", deletarClinica);
  * /clinicas/{id}:
  *   get:
  *     summary: Detalhar uma clínica
- *     tags: [Clinics]
+ *     tags: [Clinicas]
  *     parameters:
  *       - name: id
  *         in: path

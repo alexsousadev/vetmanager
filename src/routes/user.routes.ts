@@ -7,7 +7,7 @@ const userRouter = Router();
  * @swagger
  * tags:
  *   name: Users
- *   description: API para gerenciar usuários
+ *   description: Gerenciamento de Usuários
  */
 
 /**

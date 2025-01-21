@@ -7,6 +7,7 @@ import {
     loginClinica,
     detalhesClinica,
 } from "../controllers/clinica.controller";
+import { loginAuth } from "../controllers/auth.controller";
 
 const clinicaRouter = express.Router();
 
@@ -17,17 +18,20 @@ const clinicaRouter = express.Router();
  *   description: API para gerenciar clínicas
  */
 
+
 /**
  * @swagger
  * /clinicas:
  *   get:
  *     summary: Listar todas as clínicas
- *     tags: [Clinics]
+ *     tags: [Clinicas]
  *     responses:
  *       200:
  *         description: Lista de clínicas
+ *       404:
+ *         description: Nenhuma clínica encontrada
  */
-clinicaRouter.get("/", listarClinicas);
+clinicaRouter.get("/", loginAuth, listarClinicas);
 
 /**
  * @swagger
@@ -117,7 +121,7 @@ clinicaRouter.post("/login", loginClinica);
  *       404:
  *         description: Clínica não encontrada
  */
-clinicaRouter.put("/:id", atualizarClinica);
+clinicaRouter.put("/:id", loginAuth, atualizarClinica);
 
 /**
  * @swagger
@@ -159,6 +163,6 @@ clinicaRouter.delete("/:id", deletarClinica);
  *       404:
  *         description: Clínica não encontrada
  */
-clinicaRouter.get("/:id", detalhesClinica);
+clinicaRouter.get("/:id", loginAuth, detalhesClinica);
 
 export default clinicaRouter;

@@ -18,11 +18,6 @@ const userSchema = z.object({
 
 type UserSchema = z.infer<typeof userSchema>;
 
-//! ROTA SÓ PARA BRINCAR
-export async function Dash(req: Request, res: Response) {
-  res.send("Hello world!");
-}
-
 export const hashPassword = (password: string) => {
   const salt = genSaltSync(10);
   return hashSync(password, salt);

@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node dist/index.js",
     "build": "tsc",
-    "prisma:generate": "prisma generate --schema ./prisma/schema.prisma && npx prisma migrate dev --name init"
+    "prisma:generate": "prisma generate --schema ./prisma/schema.prisma"
   },
   "keywords": [],
   "author": "",

@@ -24,7 +24,7 @@ const swaggerOptins = {
 };
 
 const swaggerDocument = swaggerJSDoc(swaggerOptins);
-app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.use('/api', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 
 app.use(express.json())

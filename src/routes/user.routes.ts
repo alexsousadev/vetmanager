@@ -49,11 +49,11 @@ userRouter.post("/login", loginUsuario)
  *           schema:
  *             type: object
  *             properties:
- *               name:
+ *               nome_usuario:
  *                 type: string
- *               email:
+ *               email_usuario:
  *                 type: string
- *               password:
+ *               senha_usuario:
  *                 type: string
  *               cpf:
  *                 type: string
@@ -64,19 +64,5 @@ userRouter.post("/login", loginUsuario)
  *         description: Usuário já cadastrado
  */
 userRouter.post("/cadastro", cadastroUsuario)
-
-/**
- * @swagger
- * /users/dash:
- *   get:
- *     summary: Dashboard do usuário
- *     tags: [Users]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: Retorna a dashboard do usuário
- */
-userRouter.get("/dash", usuarioAuth, Dash)
 
 export default userRouter;

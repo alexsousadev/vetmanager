@@ -10,13 +10,13 @@ const JWT_KEY = EnvConfig.jwtsecret;
 
 // validação do input de usuário
 const userSchema = z.object({
-  name: z.string(),
-  email: z.string().email(),
-  password: z.string().min(2),
+  nome_usuario: z.string(),
+  email_usuario: z.string().email(),
+  senha_usuario: z.string().min(2),
   cpf: z.string(),
 });
 
-type userSchema = z.infer<typeof userSchema>;
+type UserSchema = z.infer<typeof userSchema>;
 
 //! ROTA SÓ PARA BRINCAR
 export async function Dash(req: Request, res: Response) {
@@ -31,11 +31,11 @@ export const hashPassword = (password: string) => {
 // cadastro de usuario
 export async function cadastroUsuario(req: Request, res: Response) {
   try {
-    const { name, email, password, cpf } = userSchema.parse(req.body);
+    const { nome_usuario, email_usuario, senha_usuario, cpf } = userSchema.parse(req.body);
 
-    const hashedPassword = hashPassword(password)
+    const hashedPassword = hashPassword(senha_usuario)
 
-    if (await checkHasUser(email)) {
+    if (await checkHasUser(email_usuario)) {
       return res.status(409).json({ error: "Usuário já cadastrado" }); // 409 Conflict
     }
 
@@ -43,7 +43,7 @@ export async function cadastroUsuario(req: Request, res: Response) {
       return res.status(409).json({ error: "CPF já cadastrado" }); // 409 Conflict
     }
 
-    createUser(name, email, hashedPassword, cpf);
+    createUser(nome_usuario, email_usuario, hashedPassword, cpf);
     // return res.redirect("/login")
     res.send({ message: "Usuário cadastrado com sucesso" });
   } catch (error) {

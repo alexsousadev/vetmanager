@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { listarPets, SalvarPet, atualizarPet, excluirPet, detalharPet } from "../controllers/pet.controller";
+import { listarPets, SalvarPet, atualizarPet, excluirPet, detalharPet, registrarServico } from "../controllers/pet.controller";
 import { usuarioAuth } from "../controllers/auth.controller";
 
 const petRouter = Router();
@@ -141,5 +141,7 @@ petRouter.delete("/:id", usuarioAuth, excluirPet);
  *         description: Pet não encontrado
  */
 petRouter.get("/:id", usuarioAuth, detalharPet);
+
+petRouter.post("/services", registrarServico);
 
 export default petRouter;

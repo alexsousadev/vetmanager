@@ -8,43 +8,85 @@ datasource db {
 }
 
 model Usuario {
-  id_usuario    Int         @id @default(autoincrement())
-  cpf_usuario   String      @unique
+  id_usuario    Int           @id @default(autoincrement())
+  cpf_usuario   String        @unique
   nome_usuario  String
-  email_usuario String      @unique
+  email_usuario String        @unique
   senha_usuario String
   Avaliacao     Avaliacao[]
   Pet           Pet[]
+  Agendamento   Agendamento[]
 }
 
 model Pet {
-  id_pet            Int     @id @default(autoincrement())
+  id_pet            Int           @id @default(autoincrement())
   nome_pet          String
   especie           String
   raca              String
   peso              Float
-  id_usuario        Usuario @relation(fields: [usuarioId_usuario], references: [id_usuario])
+  id_usuario        Usuario       @relation(fields: [usuarioId_usuario], references: [id_usuario])
   usuarioId_usuario Int
+  Agendamento       Agendamento[]
 }
 
 model Clinica {
-  id_clinica        Int         @id @default(autoincrement())
-  cnpj_clinica      String      @unique
-  senha_clinica     String
+  id_clinica        Int                    @id
+  cnpj_clinica      String                 @unique
   nome_clinica      String
-  endereco_clinica  String
   telefone_clinica  String
   foto_clinica      String
   avaliacao_clinica Float
   total_avaliacoes  Int
   Avaliacao         Avaliacao[]
+  Agendamento       Agendamento[]
+  Horarios          HorarioFuncionamento[]
+  id_localizacao    LocalizacaoClinica[]
+  ServicoClinica    ServicoClinica[]
+}
+
+model ServicoClinica {
+  id_servico_clinica Int     @id @default(autoincrement())
+  servicoId          Int
+  servico            Servico @relation(fields: [servicoId], references: [id_servico])
+  clinicaId          Int
+  clinica            Clinica @relation(fields: [clinicaId], references: [id_clinica])
 }
 
 model Servico {
-  id_servico        Int    @id @default(autoincrement())
+  id_servico        Int              @id
   nome_servico      String
   descricao_servico String
   preco_servico     Float
+  Agendamento       Agendamento[]
+  ServicoClinica    ServicoClinica[]
+}
+
+model LocalizacaoClinica {
+  id_localizacao    Int     @id @default(autoincrement())
+  latitude          Float // Coordenada para mapa
+  longitude         Float // Coordenada para mapa
+  endereco          String
+  cidade            String
+  estado            String
+  cep               String
+  clinicaId_clinica Int
+  Clinica           Clinica @relation(fields: [clinicaId_clinica], references: [id_clinica])
+}
+
+model DiaSemana {
+  id_dia   Int                    @id @default(autoincrement())
+  nome_dia String                 @unique
+  Horarios HorarioFuncionamento[]
+}
+
+model HorarioFuncionamento {
+  id_horario     Int       @id @unique @default(autoincrement())
+  horario_inicio String // Armazena no formato "HH:mm"
+  horario_fim    String // Armazena no formato "HH:mm"
+  id_dia         Int // Dia da semana associado
+  dia            DiaSemana @relation(fields: [id_dia], references: [id_dia])
+  Clinica        Clinica?  @relation(fields: [clinicaId], references: [id_clinica])
+  clinicaId      Int?
 }
 
 model Avaliacao {
@@ -56,4 +98,30 @@ model Avaliacao {
   id_usuario           Usuario  @relation(fields: [usuarioId_usuario], references: [id_usuario])
   clinicaId_clinica    Int
   usuarioId_usuario    Int
+}
+
+model Agendamento {
+  id_agendamento                Int               @id @default(autoincrement())
+  data_agendamento              DateTime
+  horario_agendamento           DateTime
+  status_agendamento            String
+  id_servico                    Servico           @relation(fields: [servicoId], references: [id_servico])
+  id_pet                        Pet               @relation(fields: [petId], references: [id_pet])
+  id_usuario                    Usuario           @relation(fields: [usuarioId], references: [id_usuario])
+  id_clinica                    Clinica           @relation(fields: [clinicaId], references: [id_clinica])
+  servicoId                     Int
+  petId                         Int
+  usuarioId                     Int
+  clinicaId                     Int
+  resultadoId                   ResultadoConsulta @relation(fields: [resultadoConsultaId_resultado], references: [id_resultado])
+  resultadoConsultaId_resultado Int
+}
+
+model ResultadoConsulta {
+  id_resultado   Int           @id @default(autoincrement())
+  diagnostico    String
+  observacoes    String?
+  id_agendamento Int           @unique
+  data_resultado DateTime      @default(now()) // Armazena a data do resultado
+  Agendamento    Agendamento[]
 }

@@ -112,11 +112,13 @@ const finalizarSessao = (req: Request, res: Response) => {
 
 // middlewere para verificação do login
 function loginAuth(req: Request, res: Response, next: NextFunction) {
-    const token = req.session.user;
+    const authHeader = req.headers.authorization;
 
-    if (!token) {
-        return res.status(401).send("Token inválido");
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return res.status(401).json({ error: 'Acesso não autorizado - Token não fornecido' });
     }
+
+    const token = authHeader.split(' ')[1];
 
     try {
         const decodedToken = verify(token as string, JWT_KEY);

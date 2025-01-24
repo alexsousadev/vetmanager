@@ -1,11 +1,13 @@
 import express from "express";
 import {
     listarClinicas,
-    cadastrarClinica,
     atualizarClinica,
     deletarClinica,
-    loginClinica,
-    detalhesClinica,
+    detalhesClinica, cadastroDias,
+    cadastrarClinicas,
+    cadastroLocalizacao,
+    cadastroHorario,
+    cadastroServicos
 } from "../controllers/clinica.controller";
 import { loginAuth } from "../controllers/auth.controller";
 
@@ -31,7 +33,7 @@ const clinicaRouter = express.Router();
  *       404:
  *         description: Nenhuma clínica encontrada
  */
-clinicaRouter.get("/", loginAuth, listarClinicas);
+clinicaRouter.get("/", listarClinicas);
 
 /**
  * @swagger
@@ -48,19 +50,104 @@ clinicaRouter.get("/", loginAuth, listarClinicas);
  *             properties:
  *               nome_clinica:
  *                 type: string
+ *                 description: Nome da clínica (obrigatório)
  *               endereco_clinica:
  *                 type: string
+ *                 description: Endereço da clínica (obrigatório)
  *               telefone_clinica:
  *                 type: string
+ *                 description: Telefone da clínica (obrigatório)
  *               foto_clinica:
  *                 type: string
+ *                 description: URL da foto da clínica (obrigatório)
  *               senha_clinica:
  *                 type: string
+ *                 description: Senha da clínica (obrigatório)
+ *               avaliacao_clinica:
+ *                 type: number
+ *                 description: Avaliação da clínica (obrigatório)
+ *               total_avaliacoes:
+ *                 type: integer
+ *                 description: Total de avaliações (obrigatório)
+ *               cnpj_clinica:
+ *                 type: string
+ *                 description: CNPJ da clínica (obrigatório)
  *     responses:
  *       201:
  *         description: Clínica cadastrada com sucesso
  */
-clinicaRouter.post("/cadastro", cadastrarClinica);
+
+/**
+ * @swagger
+ * /clinicas/cadastro/multiple:
+ *   post:
+ *     summary: Cadastrar várias clínicas
+ *     tags: [Clinicas]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               clinicas:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     cnpj_clinica:
+ *                       type: string
+ *                     nome_clinica:
+ *                       type: string
+ *                     endereco_clinica:
+ *                       type: string
+ *                     telefone_clinica:
+ *                       type: string
+ *                     foto_clinica:
+ *                       type: string
+ *                     avaliacao_clinica:
+ *                       type: number
+ *                     total_avaliacoes:
+ *                       type: integer
+ *                     localizacao:
+ *                       type: object
+ *                       properties:
+ *                         latitude:
+ *                           type: number
+ *                         longitude:
+ *                           type: number
+ *                         endereco:
+ *                           type: string
+ *                         cidade:
+ *                           type: string
+ *                         estado:
+ *                           type: string
+ *                         cep:
+ *                           type: string
+ *                     disponibilidade:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           dia_semana:
+ *                             type: string
+ *                           horario_inicio:
+ *                             type: string
+ *                           horario_fim:
+ *                             type: string
+ *     responses:
+ *       201:
+ *         description: Clínicas cadastradas com sucesso
+ */
+clinicaRouter.post("/cadastro", cadastrarClinicas);
+
+clinicaRouter.post("/localizacao", cadastroLocalizacao);
+
+clinicaRouter.post("/horario", cadastroHorario);
+
+clinicaRouter.post("/servicos", cadastroServicos);
+
+// clinicaRouter.post("/povoar", povoarClinica)
 
 /**
  * @swagger
@@ -85,7 +172,7 @@ clinicaRouter.post("/cadastro", cadastrarClinica);
  *       401:
  *         description: Credenciais inválidas
  */
-clinicaRouter.post("/login", loginClinica);
+// clinicaRouter.post("/login", loginClinica);
 
 /**
  * @swagger
@@ -163,6 +250,8 @@ clinicaRouter.delete("/:id", deletarClinica);
  *       404:
  *         description: Clínica não encontrada
  */
-clinicaRouter.get("/:id", loginAuth, detalhesClinica);
+clinicaRouter.get("/:id", detalhesClinica);
+
+clinicaRouter.post("/cadastrodias", cadastroDias)
 
 export default clinicaRouter;

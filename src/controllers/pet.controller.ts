@@ -1,6 +1,6 @@
 import { prisma } from "../services/database.service";
 import { Request, Response } from "express";
-import { z, ZodError } from "zod";
+import { z } from "zod";
 
 const petSchema = z.object({
     nome_pet: z.string(),
@@ -11,6 +11,15 @@ const petSchema = z.object({
 });
 
 type petSchema = z.infer<typeof petSchema>;
+
+const servicoSchema = z.object({
+    id_servico: z.number(),
+    nome_servico: z.string(),
+    descricao_servico: z.string(),
+    preco_servico: z.number(),
+});
+
+const servicosSchema = z.array(servicoSchema);
 
 // Listar
 export const listarPets = async (req: Request, res: Response) => {
@@ -127,5 +136,26 @@ export const detalharPet = async (req: Request, res: Response) => {
         return res.status(200).json(pet);
     } catch (error) {
         return res.status(500).json({ message: "Erro ao buscar detalhes do pet", error });
+    }
+};
+
+export const registrarServico = async (req: Request, res: Response) => {
+    try {
+        const servicos = servicosSchema.parse(req.body);
+
+        const servicosCriados = await Promise.all(servicos.map(servico =>
+            prisma.servico.create({
+                data: {
+                    id_servico: servico.id_servico,
+                    nome_servico: servico.nome_servico,
+                    descricao_servico: servico.descricao_servico,
+                    preco_servico: servico.preco_servico,
+                }
+            })
+        ));
+
+        return res.status(201).json(servicosCriados);
+    } catch (error) {
+        return res.status(500).json({ message: "Erro ao registrar serviços", error });
     }
 };

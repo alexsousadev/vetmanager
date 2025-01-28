@@ -31,23 +31,28 @@ export async function cadastroUsuario(req: Request, res: Response) {
     const hashedPassword = hashPassword(senha_usuario)
 
     if (await checkHasUser(email_usuario)) {
-      return res.status(409).json({ error: "Usuário já cadastrado" }); // 409 Conflict
+      return res.status(409).json({ error: "Usuário já cadastrado" });
     }
 
     if (await checkCpf(cpf)) {
-      return res.status(409).json({ error: "CPF já cadastrado" }); // 409 Conflict
+      return res.status(409).json({ error: "CPF já cadastrado" });
     }
 
-    createUser(nome_usuario, email_usuario, hashedPassword, cpf);
-    // return res.redirect("/login")
-    res.send({ message: "Usuário cadastrado com sucesso" });
+    await createUser(nome_usuario, email_usuario, hashedPassword, cpf);
+    
+    res.status(201).json({ message: "Usuário cadastrado com sucesso" });
   } catch (error) {
+    console.error("Erro detalhado:", error);
     if (error instanceof ZodError) {
-      return res.status(400).json({ error: "Dados de entrada inválidos" });
+      return res.status(400).json({ 
+        error: "Dados de entrada inválidos",
+        details: error.errors 
+      });
     }
-    return res
-      .status(500)
-      .json({ error: "Ocorreu um erro interno do servidor." });
+    return res.status(500).json({ 
+      error: "Ocorreu um erro interno do servidor.",
+      details: error instanceof Error ? error.message : String(error)
+    });
   }
 }
 

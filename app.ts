@@ -7,6 +7,7 @@ import Pet_routes from './src/routes/pet.routes';
 import { EnvConfig } from './src/services/env.service';
 import swaggerJSDoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
+import consultaRouter from './src/routes/consulta.routes';
 const app = express()
 
 const PORT = EnvConfig.port
@@ -35,6 +36,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use("/clinicas", routesClinicas);
 app.use("/users", userRoutes);
 app.use("/pets", Pet_routes);
+app.use("/consultas", consultaRouter);
 
 app.listen(PORT, () => {
     console.log(`Server is running on port http://localhost:${PORT}`)

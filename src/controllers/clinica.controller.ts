@@ -24,6 +24,38 @@ const clinicaServicoSchema = z.object({
 const ClinicaServicoSchema = z.array(clinicaServicoSchema);
 
 
+export const adicionarHorarios = async (req: Request, res: Response) => {
+    try {
+        const dados = horarioSchema.parse(req.body);
+
+        // Verifica se a clínica existe
+        const clinicaExistente = await prisma.clinica.findUnique({
+            where: { id_clinica: dados.clinicaId },
+        });
+
+        if (!clinicaExistente) {
+            return res.status(404).json({ message: "Clínica não encontrada" });
+        }
+
+        // Cria o horário
+        const novoHorario = await prisma.horarioFuncionamento.create({
+            data: {
+                horario_inicio: dados.horario_inicio,
+                horario_fim: dados.horario_fim,
+                id_dia: dados.id_dia,
+                clinicaId: dados.clinicaId,
+            },
+        });
+
+        return res.status(201).json(novoHorario);
+    } catch (error) {
+        console.error("Erro ao adicionar horário:", error);
+        if (error instanceof ZodError) {
+            return res.status(400).json({ error: error.errors });
+        }
+        return res.status(500).json({ message: "Erro ao adicionar horário" });
+    }
+};
 
 
 export const cadastroServicos = async (req: Request, res: Response) => {

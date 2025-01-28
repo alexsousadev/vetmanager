@@ -27,6 +27,7 @@ model Pet {
   id_usuario        Usuario       @relation(fields: [usuarioId_usuario], references: [id_usuario])
   usuarioId_usuario Int
   Agendamento       Agendamento[]
+  consultas         ConsultaVeterinaria[]
 }
 
 model Clinica {
@@ -42,6 +43,7 @@ model Clinica {
   Horarios          HorarioFuncionamento[]
   id_localizacao    LocalizacaoClinica[]
   ServicoClinica    ServicoClinica[]
+  consultas         ConsultaVeterinaria[]
 }
 
 model ServicoClinica {
@@ -124,4 +126,21 @@ model ResultadoConsulta {
   id_agendamento Int           @unique
   data_resultado DateTime      @default(now()) // Armazena a data do resultado
   Agendamento    Agendamento[]
+}
+
+model ConsultaVeterinaria {
+  id_consulta      Int      @id @default(autoincrement())
+  data_consulta    DateTime
+  nome_veterinario String
+  diagnostico      String
+  prescricao      String?
+  observacoes     String?
+  
+  // Relacionamentos
+  pet             Pet      @relation(fields: [petId_pet], references: [id_pet])
+  petId_pet       Int
+  clinica         Clinica  @relation(fields: [clinicaId_clinica], references: [id_clinica])
+  clinicaId_clinica Int
+
+  @@map("consultas_veterinarias")
 }

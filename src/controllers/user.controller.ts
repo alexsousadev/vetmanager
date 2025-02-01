@@ -39,17 +39,17 @@ export async function cadastroUsuario(req: Request, res: Response) {
     }
 
     await createUser(nome_usuario, email_usuario, hashedPassword, cpf);
-    
+
     res.status(201).json({ message: "Usuário cadastrado com sucesso" });
   } catch (error) {
     console.error("Erro detalhado:", error);
     if (error instanceof ZodError) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         error: "Dados de entrada inválidos",
-        details: error.errors 
+        details: error.errors
       });
     }
-    return res.status(500).json({ 
+    return res.status(500).json({
       error: "Ocorreu um erro interno do servidor.",
       details: error instanceof Error ? error.message : String(error)
     });

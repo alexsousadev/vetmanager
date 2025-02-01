@@ -19,12 +19,12 @@ model Usuario {
 }
 
 model Pet {
-  id_pet            Int           @id @default(autoincrement())
+  id_pet            Int                   @id @default(autoincrement())
   nome_pet          String
   especie           String
   raca              String
   peso              Float
-  id_usuario        Usuario       @relation(fields: [usuarioId_usuario], references: [id_usuario])
+  id_usuario        Usuario               @relation(fields: [usuarioId_usuario], references: [id_usuario])
   usuarioId_usuario Int
   Agendamento       Agendamento[]
   consultas         ConsultaVeterinaria[]
@@ -103,20 +103,20 @@ model Avaliacao {
 }
 
 model Agendamento {
-  id_agendamento                Int               @id @default(autoincrement())
+  id_agendamento                Int                @id @default(autoincrement())
   data_agendamento              DateTime
-  horario_agendamento           DateTime
-  status_agendamento            String
-  id_servico                    Servico           @relation(fields: [servicoId], references: [id_servico])
-  id_pet                        Pet               @relation(fields: [petId], references: [id_pet])
-  id_usuario                    Usuario           @relation(fields: [usuarioId], references: [id_usuario])
-  id_clinica                    Clinica           @relation(fields: [clinicaId], references: [id_clinica])
+  horario_agendamento           String
+  status_agendamento            String             @default("Agendado")
+  servico                       Servico            @relation(fields: [servicoId], references: [id_servico])
+  pet                           Pet                @relation(fields: [petId], references: [id_pet])
+  usuario                       Usuario            @relation(fields: [usuarioId], references: [id_usuario])
+  clinica                       Clinica            @relation(fields: [clinicaId], references: [id_clinica])
   servicoId                     Int
   petId                         Int
   usuarioId                     Int
   clinicaId                     Int
-  resultadoId                   ResultadoConsulta @relation(fields: [resultadoConsultaId_resultado], references: [id_resultado])
-  resultadoConsultaId_resultado Int
+  resultadoId                   ResultadoConsulta? @relation(fields: [resultadoConsultaId_resultado], references: [id_resultado])
+  resultadoConsultaId_resultado Int?
 }
 
 model ResultadoConsulta {
@@ -133,13 +133,13 @@ model ConsultaVeterinaria {
   data_consulta    DateTime
   nome_veterinario String
   diagnostico      String
-  prescricao      String?
-  observacoes     String?
-  
+  prescricao       String?
+  observacoes      String?
+
   // Relacionamentos
-  pet             Pet      @relation(fields: [petId_pet], references: [id_pet])
-  petId_pet       Int
-  clinica         Clinica  @relation(fields: [clinicaId_clinica], references: [id_clinica])
+  pet               Pet     @relation(fields: [petId_pet], references: [id_pet])
+  petId_pet         Int
+  clinica           Clinica @relation(fields: [clinicaId_clinica], references: [id_clinica])
   clinicaId_clinica Int
 
   @@map("consultas_veterinarias")

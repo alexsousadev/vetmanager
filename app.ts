@@ -8,6 +8,7 @@ import { EnvConfig } from './src/services/env.service';
 import swaggerJSDoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 const app = express()
+import cors from 'cors';
 
 const PORT = EnvConfig.port
 
@@ -26,6 +27,10 @@ const swaggerOptins = {
 const swaggerDocument = swaggerJSDoc(swaggerOptins);
 app.use('/api', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
+
+app.use(cors()); // Permite todas as origens
+
+// ... seu restante do código ...
 
 app.use(express.json())
 app.use(bodyParser.json());

@@ -37,6 +37,7 @@
     "zod-validation-error": "^3.4.0"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.17",
     "@types/jsonwebtoken": "^9.0.7",
     "@types/node": "^22.5.4",
     "@types/swagger-jsdoc": "^6.0.4",

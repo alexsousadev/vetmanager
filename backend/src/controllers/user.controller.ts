@@ -4,7 +4,7 @@ import { PrismaService } from "../services/database.service";
 import { sign, verify, JwtPayload } from "jsonwebtoken"
 import { compare } from 'bcrypt';
 
-const prisma = new PrismaService();
+export const prisma = new PrismaService();
 
 const JWT_KEY = process.env.JWT_SECRET_KEY || 'secret dog'
 
@@ -64,43 +64,45 @@ export const generateToken = (email: string) => {
 // pega id do usuario com base no token
 const getIdUser = async (token: string) => {
     try {
-
         if (!JWT_KEY) {
             throw Error('JWT_SECRET_KEY não está definida no ambiente.');
         }
 
-        if (token) {
-            const decoded = await verifyTokenAsync(token, JWT_KEY)
-
-            if (decoded && typeof decoded !== 'string' && 'email' in decoded) {
-
-                const user = await prisma.usuario.findUnique({
-                    where: { email_usuario: decoded.email },  // Busca o usuário pelo email
-                });
-
-                if (!!user) {
-                    return user.id_usuario;
-                }
-            }
+        if (!token) {
+            throw Error('Token não fornecido.');
         }
+
+        const decoded = await verifyTokenAsync(token, JWT_KEY);
+
+        console.log("Token decodificado:", decoded); // Debug
+
+        if (!decoded || typeof decoded !== 'object' || !decoded.email) {
+            throw new Error("Token inválido ou corrompido.");
+        }
+
+        const user = await prisma.usuario.findUnique({
+            where: { email_usuario: decoded.email },
+        });
+
+        return user ? user.id_usuario : null;
     } catch (err) {
         console.error('Erro ao pegar o ID do usuário:', err);
-        throw err;  // Isso vai cair no bloco catch do router e causar o "internal server error"
+        throw err;
     }
-}
+};
 
 export const getUserProfile = async (req: Request, res: Response) => {
     try {
-        const token = req.headers.authorization?.split(" ")[1] as string; // Pegando o token do header
+        const token = req.headers.authorization?.split(" ")[1];
 
         if (!token) {
-            res.status(401).json({ message: "Token não fornecido" });
+            return res.status(401).json({ message: "Token não fornecido" });
         }
 
-        const userId = await getIdUser(token); // Pegando o ID do usuário pelo token
+        const userId = await getIdUser(token);
 
         if (!userId) {
-            res.status(404).json({ message: "Usuário não encontrado" });
+            return res.status(404).json({ message: "Usuário não encontrado" });
         }
 
         const usuario = await prisma.usuario.findUnique({
@@ -123,6 +125,7 @@ export const getUserProfile = async (req: Request, res: Response) => {
         return res.status(500).json({ message: "Erro ao buscar perfil do usuário", error });
     }
 };
+
 
 
 // Função para verificar o token de forma assíncrona

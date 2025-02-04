@@ -1,9 +1,12 @@
 import { Router, Request, Response } from "express";
-import { checkLogin, checkHasUser, generateToken, createUser } from "../controllers/user.controller";
+import { checkLogin, checkHasUser, generateToken, createUser, prisma, getUserProfile } from "../controllers/user.controller";
 import { genSaltSync, hashSync } from 'bcrypt';
 import { userAuth } from '../middlewere/user-auth.middlewere';
 import { z, ZodError } from 'zod';
 import path from "path";
+import { Prisma, PrismaClient } from "@prisma/client";
+import { PrismaService } from "../services/database.service";
+import { upload } from "../middlewere/user-image.middleware";
 
 
 
@@ -13,6 +16,7 @@ const userSchema = z.object({
     password: z.string().min(6),
     cpf: z.string().min(11).max(14),
 });
+
 
 const router = Router();
 
@@ -87,20 +91,70 @@ router.post("/login", async (req: Request, res: Response) => {
 
         if (loginValidation) {
             const tokenJWT = generateToken(email);
-            req.session.user = tokenJWT;
 
-            // 🔹 Alterado para retornar JSON em vez de redirecionar
-            res.status(200).json({ token: tokenJWT });
+            // 🔹 Buscar o ID do usuário pelo email
+            const user = await prisma.usuario.findUnique({
+                where: { email_usuario: email },
+                select: { id_usuario: true },
+            });
+
+            if (!user) {
+                return res.status(404).json({ error: "Usuário não encontrado" });
+            }
+
+            req.session.user = tokenJWT;
+            
+            // 🔹 Retorna o token e o ID do usuário corretamente
+            return res.status(200).json({ token: tokenJWT, id_usuario: user.id_usuario });
         } else {
-            res.status(401).json({ error: "Email ou senha inválidos" });
+            return res.status(401).json({ error: "Email ou senha inválidos" });
         }
     } catch (error) {
         if (error instanceof ZodError) {
             return res.status(400).json({ error: error.message });
         }
-        res.status(500).json({ error: "Erro interno no servidor." });
+        console.error("Erro ao realizar login:", error);
+        return res.status(500).json({ error: "Erro interno no servidor." });
     }
 });
+
+
+
+router.get("/me", userAuth, getUserProfile);
+
+
+router.get("/:id", async (req: Request, res: Response) => {
+    try {
+        const userId = parseInt(req.params.id);
+
+        if (isNaN(userId)) {
+            return res.status(400).json({ message: "ID inválido." });
+        }
+
+        const usuario = await prisma.usuario.findUnique({
+            where: { id_usuario: userId },
+            select: {
+                id_usuario: true,
+                cpf_usuario: true,
+                nome_usuario: true,
+                email_usuario: true,
+            },
+        });
+
+        if (!usuario) {
+            return res.status(404).json({ message: "Usuário não encontrado." });
+        }
+
+        return res.status(200).json(usuario);
+    } catch (error) {
+        console.error("Erro ao buscar usuário por ID:", error);
+        return res.status(500).json({ message: "Erro interno no servidor." });
+    }
+});
+
+
+
+
 
 /**
  * @swagger
@@ -185,6 +239,30 @@ router.post("/cadastro", async (req: Request, res: Response) => {
         return res.status(500).json({ error: "Erro interno no servidor." });
     }
 });
+
+/*
+router.post("/users/:id/uploadPhoto", upload.single('file'), async (req: Request, res: Response) => {
+    try {
+        const userId = parseInt(req.params.id);
+        if (!req.file) {
+            return res.status(400).json({ message: "Nenhuma imagem enviada." });
+        }
+
+        const imagePath = `/uploads/${req.file.filename}`;
+
+        await prisma.usuario.update({
+            where: { id_usuario: userId },
+            data: { profile_picture: imagePath }
+        });
+
+        return res.status(200).json({ message: "Imagem enviada com sucesso!", path: imagePath });
+    } catch (error) {
+        console.error("Erro ao salvar imagem:", error);
+        return res.status(500).json({ message: "Erro ao salvar imagem" });
+    }
+});
+*/
+
 /**
  * @swagger
  * /users/dashboard:
@@ -199,6 +277,10 @@ router.post("/cadastro", async (req: Request, res: Response) => {
  *       401:
  *         description: Usuário não autenticado.
  */
+
+
+
+
 router.get("/dashboard", userAuth, (req: Request, res: Response) => {
         res.sendFile(path.join(__dirname, "/public/dashboard.html"))
 });

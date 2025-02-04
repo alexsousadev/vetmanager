@@ -8,10 +8,10 @@ datasource db {
 }
 
 model Usuario {
-  id_usuario    Int         @id @default(autoincrement())
-  cpf_usuario   String         @unique
+  id_usuario    Int       @id @default(autoincrement())
+  cpf_usuario   String    @unique
   nome_usuario  String
-  email_usuario String      @unique
+  email_usuario String    @unique
   senha_usuario String
   Avaliacao     Avaliacao[]
   Pet           Pet[]

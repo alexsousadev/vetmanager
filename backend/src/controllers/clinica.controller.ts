@@ -6,17 +6,26 @@ const prisma = new PrismaService();
 
 export const listarClinicas = async (req: Request, res: Response) => {
     try {
-        const clinicas = await prisma.clinica.findMany({
-            include: {
-                Avaliacao: true,
-            },
-        });
+        const clinicas = await prisma.clinica.findMany();
 
         if (!clinicas || clinicas.length === 0) {
             return res.status(404).json({ message: "Nenhuma clínica encontrada!" });
         }
 
-        return res.status(200).json(clinicas);
+        // Ajustar os nomes dos campos para o formato correto
+        const responseClinicas = clinicas.map(clinica => ({
+            id_clinica: clinica.id_clinica,
+            nome_clinica: clinica.nome_clinica,
+            endereco_clinica: clinica.endereco_clinica,
+            telefone_clinica: clinica.telefone_clinica,
+            foto_clinica: clinica.foto_clinica,
+            avaliacao_clinica: clinica.avaliacao_clinica,
+            total_avaliacoes: clinica.total_avaliacoes,
+            latitude: clinica.latitude,
+            longitude: clinica.longitude
+        }));
+
+        return res.status(200).json(responseClinicas);
     } catch (error) {
         return res.status(500).json({ message: "Erro ao listar clínicas", error });
     }
@@ -64,6 +73,7 @@ export const cadastrarClinica = async (req: Request, res: Response) => {
         return res.status(500).json({ message: "Erro ao cadastrar clínica", error });
     }
 };
+
 
 
 

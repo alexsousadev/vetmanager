@@ -74,7 +74,7 @@ model LocalizacaoClinica {
 }
 
 model DiaSemana {
-  id_dia   Int                    @id @default(autoincrement())
+  id_dia   Int                    @id
   nome_dia String                 @unique
   Horarios HorarioFuncionamento[]
 }
@@ -101,20 +101,20 @@ model Avaliacao {
 }
 
 model Agendamento {
-  id_agendamento                Int               @id @default(autoincrement())
-  data_agendamento              DateTime
-  horario_agendamento           DateTime
-  status_agendamento            String
-  id_servico                    Servico           @relation(fields: [servicoId], references: [id_servico])
-  id_pet                        Pet               @relation(fields: [petId], references: [id_pet])
-  id_usuario                    Usuario           @relation(fields: [usuarioId], references: [id_usuario])
-  id_clinica                    Clinica           @relation(fields: [clinicaId], references: [id_clinica])
-  servicoId                     Int
-  petId                         Int
-  usuarioId                     Int
-  clinicaId                     Int
-  resultadoId                   ResultadoConsulta @relation(fields: [resultadoConsultaId_resultado], references: [id_resultado])
-  resultadoConsultaId_resultado Int
+  id_agendamento      Int                @id @default(autoincrement())
+  data_agendamento    DateTime
+  horario_agendamento DateTime
+  status_agendamento  String
+  id_servico          Int // Alterado para ser um campo Int
+  servico             Servico            @relation(fields: [id_servico], references: [id_servico])
+  id_pet              Int // Alterado para ser um campo Int
+  pet                 Pet                @relation(fields: [id_pet], references: [id_pet])
+  id_usuario          Int // Alterado para ser um campo Int
+  usuario             Usuario            @relation(fields: [id_usuario], references: [id_usuario])
+  id_clinica          Int // Alterado para ser um campo Int
+  clinica             Clinica            @relation(fields: [id_clinica], references: [id_clinica])
+  resultadoId         Int? // Alterado para ser um campo Int opcional
+  resultado           ResultadoConsulta? @relation(fields: [resultadoId], references: [id_resultado])
 }
 
 model ResultadoConsulta {

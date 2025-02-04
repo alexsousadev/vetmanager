@@ -27,8 +27,12 @@ const swaggerOptins = {
 const swaggerDocument = swaggerJSDoc(swaggerOptins);
 app.use('/api', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-// Middleware
-app.use(cors()); // Permite todas as origens
+app.use(cors({
+    origin: '*',  // Libera todas as origens (não recomendado para produção)
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+}));
+
 app.use(express.json());
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));

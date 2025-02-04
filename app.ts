@@ -1,5 +1,6 @@
 import express, { Response, Request } from 'express';
 import bodyParser from 'body-parser';
+import cors from 'cors';
 import userRoutes from './src/routes/user.routes';
 import path from 'path';
 import routesClinicas from './src/routes/clinica.routes';
@@ -7,9 +8,9 @@ import Pet_routes from './src/routes/pet.routes';
 import { EnvConfig } from './src/services/env.service';
 import swaggerJSDoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
-const app = express()
 
-const PORT = EnvConfig.port
+const app = express();
+const PORT = EnvConfig.port;
 
 const swaggerOptins = {
     definition: {
@@ -26,16 +27,18 @@ const swaggerOptins = {
 const swaggerDocument = swaggerJSDoc(swaggerOptins);
 app.use('/api', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-
-app.use(express.json())
+// Middleware
+app.use(cors()); // Permite todas as origens
+app.use(express.json());
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Rotas
 app.use("/clinicas", routesClinicas);
 app.use("/users", userRoutes);
 app.use("/pets", Pet_routes);
 
 app.listen(PORT, () => {
-    console.log(`Server is running on port http://localhost:${PORT}`)
-})
+    console.log(`Server is running on port http://localhost:${PORT}`);
+});

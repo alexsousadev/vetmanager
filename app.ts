@@ -28,7 +28,7 @@ const swaggerOptions = {
             //     url: `vetman.onrender.com/`
             // },
             {
-                url: `http://localhost:${PORT}`,
+                url: `https://vetmanager-cvof.onrender.com}`,
             },
         ],
         components: {

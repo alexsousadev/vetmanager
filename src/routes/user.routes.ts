@@ -12,6 +12,37 @@ const userRouter = Router();
 
 /**
  * @swagger
+ * components:
+ *   schemas:
+ *     Usuario:
+ *       type: object
+ *       properties:
+ *         id_usuario:
+ *           type: integer
+ *           example: 1
+ *         nome_usuario:
+ *           type: string
+ *           example: "João Silva"
+ *         email_usuario:
+ *           type: string
+ *           format: email
+ *           example: "joao.silva@exemplo.com"
+ *         senha_usuario:
+ *           type: string
+ *           format: password
+ *           example: "senha123"
+ *         foto_usuario:
+ *           type: string
+ *           format: uri
+ *           example: "https://exemplo.com/foto.jpg"
+ *         cpf:
+ *           type: string
+ *           example: "123.456.789-00"
+ */
+
+
+/**
+ * @swagger
  * /users/login:
  *   post:
  *     summary: Login de usuário
@@ -53,6 +84,8 @@ userRouter.post("/login", loginUsuario)
  *               email_usuario:
  *                 type: string
  *               senha_usuario:
+ *                 type: string
+ *               foto_usuario:
  *                 type: string
  *               cpf:
  *                 type: string

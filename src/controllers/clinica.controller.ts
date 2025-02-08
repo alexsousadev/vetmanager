@@ -14,21 +14,19 @@ const clinicaCadastroSchema = z.object({
 
 const ClinicasCadastroSchema = z.array(clinicaCadastroSchema);
 
-
 // schema de cadastro de servicos
 const clinicaServicoSchema = z.object({
+    id_tipo_servico: z.number(),
     servicoId: z.number(),
     clinicaId: z.number(),
+    tipoServicoId: z.number(),
 });
 
 const ClinicaServicoSchema = z.array(clinicaServicoSchema);
 
-
-
-
-export const cadastroServicos = async (req: Request, res: Response) => {
+export const cadastroServicosClinica = async (req: Request, res: Response) => {
     try {
-        const servicos = ClinicaServicoSchema.parse(req.body); // Validates the request body
+        const servicos = ClinicaServicoSchema.parse(req.body);
         const servicosCadastrados = await Promise.all(servicos.map(async (servico) => {
             // Verifica se o id_servico existe na tabela Servico
             const servicoExistente = await prisma.servico.findUnique({
@@ -37,6 +35,15 @@ export const cadastroServicos = async (req: Request, res: Response) => {
             if (!servicoExistente) {
                 throw new Error(`O serviço com ID ${servico.servicoId} não existe.`);
             }
+
+            const tipoServicoExistente = await prisma.tipoServico.findUnique({
+                where: { id_tipo_servico: servico.tipoServicoId },
+            });
+
+            if (!tipoServicoExistente) {
+                throw new Error(`O tipo de serviço com ID ${servico.tipoServicoId} não existe.`);
+            }
+
             // Verifica se o id_clinica existe na tabela Clinica
             const clinicaExistente = await prisma.clinica.findUnique({
                 where: { id_clinica: servico.clinicaId },
@@ -44,13 +51,30 @@ export const cadastroServicos = async (req: Request, res: Response) => {
             if (!clinicaExistente) {
                 throw new Error(`A clínica com ID ${servico.clinicaId} não existe.`);
             }
+
+            // Verifica se já existe uma relação entre o serviço e a clínica
+            const servicoClinicaExistente = await prisma.servicoClinica.findFirst({
+                where: {
+                    AND: [
+                        { servicoId_servico: servico.servicoId },
+                        { clinicaId: servico.clinicaId }
+                    ]
+                }
+            });
+
+            if (servicoClinicaExistente) {
+                return servicoClinicaExistente;
+            }
+
             const novoServico = await prisma.servicoClinica.create({
                 data: {
-                    servicoId: servico.servicoId,
+                    id_servico_clinica: servico.id_tipo_servico,
+                    servicoId_servico: servico.servicoId,
                     clinicaId: servico.clinicaId,
+                    tipoServicoId_tipo_servico: servico.tipoServicoId
                 },
             });
-            return novoServico; // Retorna o servico cadastrado
+            return novoServico;
         }));
         return res.status(201).json(servicosCadastrados);
     } catch (error) {
@@ -62,8 +86,7 @@ export const cadastroServicos = async (req: Request, res: Response) => {
         }
         return res.status(500).json({ message: "Erro ao cadastrar vários serviços", error });
     }
-};
-
+}
 
 // listar clinicas
 export const listarClinicas = async (req: Request, res: Response) => {

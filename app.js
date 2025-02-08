@@ -1,5 +1,5 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
+var __importDefault = (this && this.__importDefault) || function(mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -33,7 +33,7 @@ app.use(express_1.default.urlencoded({ extended: true }));
 app.use(express_1.default.static(path_1.default.join(__dirname, 'public')));
 app.use("/clinicas", clinica_routes_1.default);
 app.use("/users", user_routes_1.default);
-app.use("/pets", pet_routes_1.default);
+app.use("/pets", pet_routes_1);
 app.listen(PORT, () => {
-    console.log(`Server is running on port http://localhost:${PORT}`);
+    console.log(`Server is running on port http://localhost:${PORT}\nSwagger running on http://localhost:${PORT}/docs`);
 });

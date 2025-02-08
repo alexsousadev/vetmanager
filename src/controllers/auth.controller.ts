@@ -3,6 +3,7 @@ import { verify } from 'jsonwebtoken';
 import { prisma } from "../services/database.service";
 import { sign } from "jsonwebtoken";
 import { EnvConfig } from "../services/env.service";
+import { getIdOfUser } from "./user.controller";
 
 // Add this at the top of the file, after the imports
 declare global {
@@ -23,6 +24,7 @@ export type loginClinica = {
 };
 
 export type loginUsuario = {
+    id_usuario: string; // teste
     email_usuario: string;
     senha_usuario: string;
 };
@@ -55,6 +57,7 @@ export const typePayload = (
     typeLogin: LoginType,
     dataLogin: loginUsuario | loginClinica
 ) => {
+
     return {
         dataLogin,
         role: typeLogin,
@@ -71,6 +74,7 @@ const createRoleMiddleware = (allowedRoles: LoginType[]) => {
         }
 
         const token = authHeader.split(' ')[1];
+
 
         try {
             const decoded = verify(token, JWT_KEY) as { payload: { role: LoginType } };
@@ -158,23 +162,78 @@ export async function checkLogin(
     }
 }
 
-export const generateToken = (
+// gerar Token para autenticação
+export const generateToken = async (
     typeLogin: LoginType,
     dataLogin: loginUsuario | loginClinica
 ) => {
     const payload = typePayload(typeLogin, dataLogin);
+    let email = "";
+
+    if (typeLogin === 'USUARIO') { // Example: Adjust conditions based on your types
+        email = (dataLogin as loginUsuario).email_usuario; // Type assertion
+    } else if (typeLogin === 'CLINICA') {
+        email = (dataLogin as loginClinica).cnpj_clinica; // Assuming this property exists
+    } else {
+        throw new Error("Tipo de login inválido."); // Handle invalid login types
+    }
+
+    console.log("email: ", email);
+    const id = await getIdOfUser(email);
+
+    console.log("id: ", id);
+
 
     if (!JWT_KEY) {
         throw new Error("JWT_SECRET_KEY não está definida no ambiente.");
     }
 
-    const token = sign({ payload }, JWT_KEY, { expiresIn: "1h" });
+    const token = sign({ payload, id }, JWT_KEY, { expiresIn: "1h" });
+    console.log("token: ", token);
     return token;
 };
 
+// Função para decodificar o token
+export const decodeToken = (token: string) => {
+    try {
+        const decoded = verify(token, JWT_KEY);
+        return decoded;
+    } catch (err) {
+        console.error('Erro ao decodificar o token:', err);
+        throw new Error('Token inválido.');
+    }
+};
 
 
+// pegar o Id do Token JWT
+export const getIdOfToken = async (req: Request, res: Response) => {
+    const authHeader = req.headers.authorization;
 
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        res.status(401).json({ error: 'Token não fornecido' });
+        return null; // Retorna null para indicar que não há token válido
+    }
+
+    const token = authHeader.split(' ')[1];
+
+    try {
+        // Decodificar o token para obter o ID do usuário
+        const decoded = decodeToken(token) as any;
+
+        if (!decoded || typeof decoded.id === 'undefined') {
+            res.status(401).json({ error: 'Token inválido ou ID do usuário não encontrado no token' });
+            return null; // Retorna null se a decodificação falha ou 'id' não existe
+        }
+
+        const userId = decoded.id;
+        return userId;
+
+    } catch (error) {
+        console.error("Erro ao decodificar token:", error);
+        res.status(401).json({ error: 'Token inválido' });
+        return null; // Retorna null em caso de erro na decodificação
+    }
+}
 
 
 export { loginAuth, finalizarSessao };

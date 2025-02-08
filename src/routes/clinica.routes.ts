@@ -7,7 +7,7 @@ import {
     cadastrarClinicas,
     cadastroLocalizacao,
     cadastroHorario,
-    cadastroServicos
+    cadastroServicosClinica
 } from "../controllers/clinica.controller";
 import { loginAuth } from "../controllers/auth.controller";
 
@@ -19,6 +19,45 @@ const clinicaRouter = express.Router();
  *   name: Clinicas
  *   description: Gerenciamento de Clínicas
  */
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     Clinica:
+ *       type: object
+ *       properties:
+ *         id_clinica:
+ *           type: integer
+ *           example: 1
+ *         nome_clinica:
+ *           type: string
+ *           example: "Clínica Veterinária Exemplo"
+ *         endereco_clinica:
+ *           type: string
+ *           example: "Rua Exemplo, 123"
+ *         telefone_clinica:
+ *           type: string
+ *           example: "+55 11 98765-4321"
+ *         foto_clinica:
+ *           type: string
+ *           format: uri
+ *           example: "https://exemplo.com/foto.jpg"
+ *         senha_clinica:
+ *           type: string
+ *           format: password
+ *           example: "senha123"
+ *         avaliacao_clinica:
+ *           type: number
+ *           example: 4.5
+ *         total_avaliacoes:
+ *           type: integer
+ *           example: 150
+ *         cnpj_clinica:
+ *           type: string
+ *           example: "12.345.678/0001-90"
+ */
+
 
 
 /**
@@ -77,102 +116,13 @@ clinicaRouter.get("/", listarClinicas);
  *         description: Clínica cadastrada com sucesso
  */
 
-/**
- * @swagger
- * /clinicas/cadastro/multiple:
- *   post:
- *     summary: Cadastrar várias clínicas
- *     tags: [Clinicas]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               clinicas:
- *                 type: array
- *                 items:
- *                   type: object
- *                   properties:
- *                     cnpj_clinica:
- *                       type: string
- *                     nome_clinica:
- *                       type: string
- *                     endereco_clinica:
- *                       type: string
- *                     telefone_clinica:
- *                       type: string
- *                     foto_clinica:
- *                       type: string
- *                     avaliacao_clinica:
- *                       type: number
- *                     total_avaliacoes:
- *                       type: integer
- *                     localizacao:
- *                       type: object
- *                       properties:
- *                         latitude:
- *                           type: number
- *                         longitude:
- *                           type: number
- *                         endereco:
- *                           type: string
- *                         cidade:
- *                           type: string
- *                         estado:
- *                           type: string
- *                         cep:
- *                           type: string
- *                     disponibilidade:
- *                       type: array
- *                       items:
- *                         type: object
- *                         properties:
- *                           dia_semana:
- *                             type: string
- *                           horario_inicio:
- *                             type: string
- *                           horario_fim:
- *                             type: string
- *     responses:
- *       201:
- *         description: Clínicas cadastradas com sucesso
- */
 clinicaRouter.post("/cadastro", cadastrarClinicas);
 
 clinicaRouter.post("/localizacao", cadastroLocalizacao);
 
 clinicaRouter.post("/horario", cadastroHorario);
 
-clinicaRouter.post("/servicos", cadastroServicos);
-
-// clinicaRouter.post("/povoar", povoarClinica)
-
-/**
- * @swagger
- * /clinicas/login:
- *   post:
- *     summary: Login de clínica
- *     tags: [Clinicas]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               cnpj_clinica:
- *                 type: string
- *               senha_clinica:
- *                 type: string
- *     responses:
- *       200:
- *         description: Login bem-sucedido
- *       401:
- *         description: Credenciais inválidas
- */
-// clinicaRouter.post("/login", loginClinica);
+clinicaRouter.post("/servicos", cadastroServicosClinica);
 
 /**
  * @swagger

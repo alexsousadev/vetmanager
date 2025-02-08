@@ -1,6 +1,6 @@
 import { prisma } from "../services/database.service";
 import { verify, JwtPayload } from "jsonwebtoken";
-import { compareSync, genSaltSync, hashSync } from "bcrypt";
+import { compareSync, hashSync } from "bcrypt";
 import { Request, Response } from "express";
 import { ZodError, z } from "zod";
 import { generateToken, loginUsuario } from "./auth.controller";
@@ -14,31 +14,36 @@ const userSchema = z.object({
   email_usuario: z.string().email(),
   senha_usuario: z.string().min(2),
   cpf: z.string(),
+  foto_usuario: z.string().optional(),
 });
 
 type UserSchema = z.infer<typeof userSchema>;
 
-export const hashPassword = (password: string) => {
-  const salt = genSaltSync(10);
-  return hashSync(password, salt);
+export const hashPassword = async (password: string): Promise<string> => {
+  const saltRounds = 10;
+  const hashedPassword = hashSync(password, saltRounds); // bcrypt.hashSync is synchronous, no
+  return hashedPassword;
 };
+
 
 // cadastro de usuario
 export async function cadastroUsuario(req: Request, res: Response) {
   try {
-    const { nome_usuario, email_usuario, senha_usuario, cpf } = userSchema.parse(req.body);
 
-    const hashedPassword = hashPassword(senha_usuario)
+    console.log("dados: ", req.body)
 
-    if (await checkHasUser(email_usuario)) {
+    const newUser: UserSchema = userSchema.parse(req.body);
+
+
+    if (await checkHasUser(newUser.email_usuario)) {
       return res.status(409).json({ error: "Usuário já cadastrado" }); // 409 Conflict
     }
 
-    if (await checkCpf(cpf)) {
+    if (await checkCpf(newUser.cpf)) {
       return res.status(409).json({ error: "CPF já cadastrado" }); // 409 Conflict
     }
 
-    createUser(nome_usuario, email_usuario, hashedPassword, cpf);
+    await createUser(newUser.nome_usuario, newUser.email_usuario, newUser.senha_usuario, newUser.cpf, newUser.foto_usuario || "");
     // return res.redirect("/login")
     res.send({ message: "Usuário cadastrado com sucesso" });
   } catch (error) {
@@ -84,7 +89,7 @@ export async function loginUsuario(req: Request, res: Response) {
     const loginValidation = await checkLoginUser(req.body);
 
     if (loginValidation) {
-      const tokenJWT = generateToken("USUARIO", req.body);
+      const tokenJWT = await generateToken("USUARIO", req.body);
       res.json({ token: tokenJWT });
     } else {
       res.status(401).json({ error: "Email ou senha inválidos" });
@@ -124,17 +129,27 @@ export const checkCpf = async (cpf: string) => {
 export const createUser = async (
   nome: string,
   email: string,
-  senha: string,
-  cpf: string
+  senha: string,  // senha is still the plain text password here
+  cpf: string,
+  foto: string
 ) => {
-  await prisma.usuario.create({
-    data: {
-      nome_usuario: nome,
-      email_usuario: email,
-      senha_usuario: senha,
-      cpf_usuario: cpf,
-    },
-  });
+  try {
+    const hashedPassword = await hashPassword(senha); // Await the hashing!
+
+    const newUser = await prisma.usuario.create({
+      data: {
+        nome_usuario: nome,
+        email_usuario: email,
+        senha_usuario: hashedPassword, // Now you're storing the *result* of the promise
+        cpf_usuario: cpf,
+        foto_usuario: foto,
+      },
+    });
+    return newUser; // Return the created user object
+  } catch (error) {
+    console.error("Error creating user:", error);
+    throw error; // Re-throw the error to be handled by your error middleware
+  }
 };
 
 
@@ -195,4 +210,16 @@ const getNameUser = async (id: number) => {
   return user?.nome_usuario;
 };
 
-export { getIdUser, getNameUser };
+
+
+const getIdOfUser = async (email: string) => {
+  const user = await prisma.usuario.findUnique({
+    where: {
+      email_usuario: email,
+    },
+  });
+
+  return user?.id_usuario;
+};
+
+export { getIdUser, getNameUser, getIdOfUser };

@@ -1,6 +1,5 @@
 import { Router } from "express";
-import { listarPets, SalvarPet, atualizarPet, excluirPet, detalharPet, registrarServico } from "../controllers/pet.controller";
-import { usuarioAuth } from "../controllers/auth.controller";
+import { listarPets, atualizarPet, excluirPet, detalharPet, cadastrarPet } from "../controllers/pet.controller";
 
 const petRouter = Router();
 
@@ -13,9 +12,40 @@ const petRouter = Router();
 
 /**
  * @swagger
+ * components:
+ *   schemas:
+ *     Pet:
+ *       type: object
+ *       properties:
+ *         id_pet:
+ *           type: integer
+ *           example: 1
+ *         nome_pet:
+ *           type: string
+ *           example: "Rex"
+ *         especie_pet:
+ *           type: string
+ *           example: "Cachorro"
+ *         raca_pet:
+ *           type: string
+ *           example: "Labrador"
+ *         altura_pet:
+ *           type: number
+ *           example: 0.6
+ *         peso_pet:
+ *           type: number
+ *           example: 30.5
+ *         sexo_pet:
+ *           type: string
+ *           example: "Macho"
+ */
+
+
+/**
+ * @swagger
  * /pets:
  *   get:
- *     summary: Listar todos os pets
+ *     summary: Listar todos os pets do usuário
  *     tags: [Pets]
  *     security:
  *       - bearerAuth: []
@@ -23,7 +53,7 @@ const petRouter = Router();
  *       200:
  *         description: Lista de pets
  */
-petRouter.get("/", usuarioAuth, listarPets);
+petRouter.get("/", listarPets);
 
 /**
  * @swagger
@@ -42,19 +72,21 @@ petRouter.get("/", usuarioAuth, listarPets);
  *             properties:
  *               nome_pet:
  *                 type: string
- *               especie:
+ *               especie_pet:
  *                 type: string
- *               raca:
+ *               raca_pet:
  *                 type: string
- *               peso:
+ *               altura_pet:
  *                 type: number
- *               id_usuario:
- *                 type: integer
+ *               peso_pet:
+ *                 type: number
+ *               sexo_pet:
+ *                 type: string
  *     responses:
  *       201:
  *         description: Pet salvo com sucesso
  */
-petRouter.post("/", usuarioAuth, SalvarPet);
+petRouter.post("/", cadastrarPet);
 
 /**
  * @swagger
@@ -80,21 +112,23 @@ petRouter.post("/", usuarioAuth, SalvarPet);
  *             properties:
  *               nome_pet:
  *                 type: string
- *               especie:
+ *               especie_pet:
  *                 type: string
- *               raca:
+ *               raca_pet:
  *                 type: string
- *               peso:
+ *               altura_pet:
  *                 type: number
- *               id_usuario:
- *                 type: integer
+ *               peso_pet:
+ *                 type: number
+ *               sexo_pet:
+ *                 type: string
  *     responses:
  *       200:
  *         description: Pet atualizado com sucesso
  *       404:
  *         description: Pet não encontrado
  */
-petRouter.put("/:id", usuarioAuth, atualizarPet);
+petRouter.put("/:id", atualizarPet);
 
 /**
  * @swagger
@@ -117,7 +151,7 @@ petRouter.put("/:id", usuarioAuth, atualizarPet);
  *       404:
  *         description: Pet não encontrado
  */
-petRouter.delete("/:id", usuarioAuth, excluirPet);
+petRouter.delete("/:id", excluirPet);
 
 /**
  * @swagger
@@ -140,8 +174,6 @@ petRouter.delete("/:id", usuarioAuth, excluirPet);
  *       404:
  *         description: Pet não encontrado
  */
-petRouter.get("/:id", usuarioAuth, detalharPet);
-
-petRouter.post("/services", registrarServico);
+petRouter.get("/:id", detalharPet);
 
 export default petRouter;

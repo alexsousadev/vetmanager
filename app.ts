@@ -14,14 +14,6 @@ import agendamentoRoutes from './src/routes/agendamento.routes';
 const app = express();
 const PORT = EnvConfig.port;
 
-// Lista de origens permitidas
-const whitelist = [
-    'http://localhost:8080',          // Flutter dev
-    'http://localhost:3000',          // Web dev
-    "https://corsproxy.io/"
-];
-
-
 const swaggerOptions = {
     definition: {
         openapi: '3.0.0',
@@ -60,13 +52,7 @@ const swaggerDocument = swaggerJSDoc(swaggerOptions);
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.use(cors({
-    origin: (origin, callback) => {
-        if (!origin || whitelist.includes(origin)) {
-            callback(null, true); // Permite acesso
-        } else {
-            callback(new Error('Não permitido pelo CORS'));
-        }
-    }
+    origin: "http://localhost:8080"
 }));
 
 app.use(express.json());

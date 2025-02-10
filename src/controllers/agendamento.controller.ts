@@ -61,6 +61,7 @@ const listarAgendamentos = async (req: Request, res: Response) => {
     }
 };
 
+
 const agendarConsulta = async (req: Request, res: Response) => {
     try {
         const dados_agendamento = agendamentoSchema.parse(req.body);

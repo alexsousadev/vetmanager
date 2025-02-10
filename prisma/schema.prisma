@@ -78,8 +78,8 @@ model Servico {
 
 model LocalizacaoClinica {
   id_localizacao    Int     @id @default(autoincrement())
-  latitude          Float // Coordenada para mapa
-  longitude         Float // Coordenada para mapa
+  latitude          Float 
+  longitude         Float 
   endereco          String
   cidade            String
   estado            String
@@ -96,9 +96,9 @@ model DiaSemana {
 
 model HorarioFuncionamento {
   id_horario     Int       @id @unique @default(autoincrement())
-  horario_inicio String // Armazena no formato "HH:mm"
-  horario_fim    String // Armazena no formato "HH:mm"
-  id_dia         Int // Dia da semana associado
+  horario_inicio String 
+  horario_fim    String 
+  id_dia         Int 
   dia            DiaSemana @relation(fields: [id_dia], references: [id_dia])
   Clinica        Clinica?  @relation(fields: [clinicaId], references: [id_clinica])
   clinicaId      Int?
@@ -121,13 +121,13 @@ model Agendamento {
   horario_agendamento        String
   status_agendamento         String
   id_tipo_servico            TipoServico        @relation(fields: [tipoServicoId_tipo_servico], references: [id_tipo_servico])
-  id_pet                     Int // Alterado para ser um campo Int
+  id_pet                     Int 
   pet                        Pet                @relation(fields: [id_pet], references: [id_pet])
-  id_usuario                 Int // Alterado para ser um campo Int
+  id_usuario                 Int 
   usuario                    Usuario            @relation(fields: [id_usuario], references: [id_usuario])
-  id_clinica                 Int // Alterado para ser um campo Int
+  id_clinica                 Int 
   clinica                    Clinica            @relation(fields: [id_clinica], references: [id_clinica])
-  resultadoId                Int? // Alterado para ser um campo Int opcional
+  resultadoId                Int? 
   resultado                  ResultadoConsulta? @relation(fields: [resultadoId], references: [id_resultado])
   Servico                    Servico?           @relation(fields: [servicoId_servico], references: [id_servico])
   servicoId_servico          Int?
@@ -139,6 +139,6 @@ model ResultadoConsulta {
   diagnostico    String
   observacoes    String?
   id_agendamento Int           @unique
-  data_resultado DateTime      @default(now()) // Armazena a data do resultado
+  data_resultado DateTime      @default(now()) 
   Agendamento    Agendamento[]
 }

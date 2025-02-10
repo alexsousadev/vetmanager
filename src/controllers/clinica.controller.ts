@@ -91,20 +91,155 @@ export const cadastroServicosClinica = async (req: Request, res: Response) => {
 // listar clinicas
 export const listarClinicas = async (req: Request, res: Response) => {
     try {
-        const clinicas = await prisma.clinica.findMany({
-
-        });
+        // Busca todas as clínicas
+        const clinicas = await prisma.clinica.findMany();
 
         if (!clinicas || clinicas.length === 0) {
             return res.status(404).json({ message: "Nenhuma clínica encontrada!" });
         }
 
-        return res.status(200).json(clinicas);
+        // Para cada clínica, busca as informações de localização e serviços
+        const clinicasComDetalhes = await Promise.all(clinicas.map(async (clinica) => {
+            try {
+                // Busca a localização da clínica
+                const localizacaoClinica = await listarLocalizacaoClinica(clinica.id_clinica);
+
+                // Busca os serviços da clínica
+                const servicosDaClinica = await servicosClinicaCategoria(clinica.id_clinica);
+
+                // Retorna um objeto com todas as informações da clínica
+                return {
+                    ...clinica, // Inclui todos os dados da clínica
+                    localizacao: localizacaoClinica || null, // Se não houver localização, retorna null
+                    servicos: servicosDaClinica || [] // Se não houver serviços, retorna um array vazio
+                };
+            } catch (error) {
+                console.error(`Erro ao buscar detalhes da clínica ${clinica.id_clinica}:`, error);
+                return {
+                    ...clinica, // Retorna pelo menos os dados básicos da clínica
+                    localizacao: null, // Localização não disponível devido ao erro
+                    servicos: [] // Serviços não disponíveis devido ao erro
+                };
+            }
+        }));
+
+        // Retorna o JSON com todas as clínicas e suas informações
+        return res.status(200).json(clinicasComDetalhes);
     } catch (error) {
+        console.error("Erro ao listar clínicas:", error);
         return res.status(500).json({ message: "Erro ao listar clínicas", error });
     }
 };
+// traz localização da clinica
+export const listarLocalizacaoClinica = async (idClinica: number) => {
+    try {
+        const localizacao = await prisma.localizacaoClinica.findFirst({
+            where: {
+                clinicaId_clinica: idClinica
+            }
+        });
+        return localizacao;
+    } catch (error) {
+        console.error("Erro ao listar localização da clínica:", error);
+        return null;
+    }
+};
 
+
+const servicoClinicaSchema = z.object({
+    id_servico_clinica: z.number(),
+    clinicaId: z.number(),
+    tipoServicoId_tipo_servico: z.number(),
+    servicoId_servico: z.number().nullable(),
+    nome_tipo_servico: z.string().optional()
+});
+
+type ServicoClinicaSchema = z.infer<typeof servicoClinicaSchema>;
+
+export const servicosClinicaCategoria = async (idClinica: number) => {
+    try {
+        // Busca todos os serviços da clínica
+        const servicosClinica = await prisma.servicoClinica.findMany({
+            where: {
+                clinicaId: idClinica
+            }
+        });
+
+        // Para cada serviço, busca o nome do tipo de serviço
+        const nomesServicos = await Promise.all(
+            servicosClinica.map(async (servico) => {
+                // Encontra o tipo de serviço
+                const tipoServico = await prisma.servico.findUnique({
+                    where: {
+                        id_servico: servico.servicoId_servico ?? undefined
+                    }
+                });
+
+                if (!tipoServico) {
+                    throw new Error(`Tipo de serviço não encontrado para o ID: ${servico.servicoId_servico}`);
+                }
+
+                const tipoTrabalhoServico = await servicoTrabalhoClinica(idClinica, tipoServico?.id_servico);
+
+
+                if (!tipoServico) {
+                    throw new Error(`Tipo de serviço não encontrado para o ID: ${servico.servicoId_servico}`);
+                }
+
+                // Retorna o nome do tipo de serviço
+                return { nome_servico: tipoServico.nome_servico, trabalho: tipoTrabalhoServico }
+            })
+        );
+
+        // Remove duplicatas (se necessário)
+        const nomesUnicos = [...new Set(nomesServicos)];
+
+        return nomesUnicos; // Retorna um array com os nomes dos serviços únicos
+    } catch (error) {
+        console.error("Erro ao listar serviços da clínica:", error);
+        return null;
+    }
+};
+
+
+// retorna serviços da clinica
+export const servicoTrabalhoClinica = async (idClinica: number, servicoId: number): Promise<string[]> => {
+    let trabalhosServicos: string[] = [];
+    try {
+        // Busca todos os serviços da clínica
+        const tarefasServicosClinica = await prisma.servicoClinica.findMany({
+            where: {
+                clinicaId: idClinica
+            }
+        });
+
+        // Mapeia os serviços para o formato ServicoClinicaSchema
+        const servicosFormatados = await Promise.all(tarefasServicosClinica.map(async (servico) => {
+            // Encontra o tipo de serviço
+
+            // Giardia? Nutrição? Gripe Canina?
+            let tipoServico = await prisma.tipoServico.findUnique({
+                where: {
+                    id_tipo_servico: servico.tipoServicoId_tipo_servico
+                }
+            })
+
+            if (!tipoServico) {
+                throw new Error(`Tipo de serviço não encontrado para o ID: ${servico.tipoServicoId_tipo_servico}`);
+            }
+
+            if (servico.servicoId_servico == servicoId) {
+                trabalhosServicos.push(tipoServico?.nome_tipo);
+            }
+
+        }));
+
+        return trabalhosServicos;
+    } catch (error) {
+        console.error("Erro ao listar serviços da clínica:", error);
+        return [];
+    }
+};
 
 
 const horarioSchema = z.object({

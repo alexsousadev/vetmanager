@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { loginUsuario, cadastroUsuario } from "../controllers/user.controller";
+import { loginUsuario, cadastroUsuario, getUserInfo } from "../controllers/user.controller";
 
 const userRouter = Router();
 
@@ -39,7 +39,6 @@ const userRouter = Router();
  *           type: string
  *           example: "123.456.789-00"
  */
-
 
 /**
  * @swagger
@@ -96,5 +95,27 @@ userRouter.post("/login", loginUsuario)
  *         description: Usuário já cadastrado
  */
 userRouter.post("/cadastro", cadastroUsuario)
+
+/**
+ * @swagger
+ * /users/me:
+ *   get:
+ *     summary: Obter informações do usuário autenticado
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Informações do usuário recuperadas com sucesso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Usuario'
+ *       401:
+ *         description: Usuário não autenticado
+ *       404:
+ *         description: Usuário não encontrado
+ */
+userRouter.get("/me", getUserInfo)
 
 export default userRouter;

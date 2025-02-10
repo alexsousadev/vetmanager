@@ -3,7 +3,7 @@ import { verify, JwtPayload } from "jsonwebtoken";
 import { compareSync, hashSync } from "bcrypt";
 import { Request, Response } from "express";
 import { ZodError, z } from "zod";
-import { generateToken, loginUsuario } from "./auth.controller";
+import { generateToken, getIdOfToken, loginUsuario } from "./auth.controller";
 import { EnvConfig } from "../services/env.service";
 
 const JWT_KEY = EnvConfig.jwtsecret;
@@ -25,7 +25,35 @@ export const hashPassword = async (password: string): Promise<string> => {
   return hashedPassword;
 };
 
+// get info user
+export async function getUserInfo(req: Request, res: Response) {
 
+  const userId = await getIdOfToken(req, res);
+
+  try {
+    const user = await prisma.usuario.findUnique({
+      where: {
+        id_usuario: userId,
+      },
+      select: {
+        nome_usuario: true,
+        email_usuario: true,
+        senha_usuario: true,
+        cpf_usuario: true,
+        foto_usuario: true,
+      },
+    });
+    if (user) {
+      return res.status(200).json(user);
+    } else {
+      return res.status(404).json({ error: "Usuário não encontrado" });
+    }
+  } catch (error) {
+    console.error("Erro ao buscar informações do usuário:", error);
+    return res.status(500).json({ message: "Erro ao buscar informações do usuário. Consulte os logs do servidor para mais detalhes." });
+  }
+
+}
 // cadastro de usuario
 export async function cadastroUsuario(req: Request, res: Response) {
   try {

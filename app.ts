@@ -18,6 +18,7 @@ const PORT = EnvConfig.port;
 const whitelist = [
     'http://localhost:8080',          // Flutter dev
     'http://localhost:3000',          // Web dev
+    "https://corsproxy.io"
 ];
 
 

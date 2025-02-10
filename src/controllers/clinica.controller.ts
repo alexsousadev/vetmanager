@@ -108,11 +108,12 @@ export const listarClinicas = async (req: Request, res: Response) => {
                 const servicosDaClinica = await servicosClinicaCategoria(clinica.id_clinica);
 
                 // Retorna um objeto com todas as informações da clínica
-                res.status(200).send({
-                    ...clinica, // Inclui todos os dados da clínica
-                    localizacao: localizacaoClinica || null, // Se não houver localização, retorna null
-                    servicos: servicosDaClinica || [] // Se não houver serviços, retorna um array vazio
-                });
+                return {
+                    ...clinica,
+                    localizacao: localizacaoClinica || null,
+                    servicos: servicosDaClinica || []
+                };
+
             } catch (error) {
                 console.error(`Erro ao buscar detalhes da clínica ${clinica.id_clinica}:`, error);
                 return {

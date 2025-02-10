@@ -10,10 +10,16 @@ import swaggerUi from 'swagger-ui-express';
 import cors from 'cors';
 import servicoRoutes from './src/routes/servico.routes';
 import agendamentoRoutes from './src/routes/agendamento.routes';
-import { url } from 'inspector';
 
 const app = express();
 const PORT = EnvConfig.port;
+
+// Lista de origens permitidas
+const whitelist = [
+    'http://localhost:8080',          // Flutter dev
+    'http://localhost:3000',          // Web dev
+];
+
 
 const swaggerOptions = {
     definition: {
@@ -52,7 +58,16 @@ const swaggerOptions = {
 const swaggerDocument = swaggerJSDoc(swaggerOptions);
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-app.use(cors()); // Permite todas as origens
+app.use(cors({
+    origin: (origin, callback) => {
+        if (!origin || whitelist.includes(origin)) {
+            callback(null, true); // Permite acesso
+        } else {
+            callback(new Error('Não permitido pelo CORS'));
+        }
+    }
+}));
+
 app.use(express.json());
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));

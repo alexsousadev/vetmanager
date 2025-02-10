@@ -23,9 +23,6 @@ const swaggerOptions = {
             description: 'API do VetManager, um sistema que visa facilitar a gestão da saúde de animais de estimação, conectando tutores a clínicas veterinárias.',
         },
         servers: [
-            // {
-            //     url: `vetman.onrender.com/`
-            // },
             {
                 url: `https://vetmanager-cvof.onrender.com`,
             },

@@ -56,14 +56,14 @@ export const registrarServico = async (req: Request, res: Response) => {
         });
     } catch (error) {
         if (error instanceof Error) {
-            return res.status(500).json({ 
-                message: "Erro ao registrar serviços", 
-                error: error.message 
+            return res.status(500).json({
+                message: "Erro ao registrar serviços",
+                error: error.message
             });
         }
-        return res.status(500).json({ 
-            message: "Erro ao registrar serviços", 
-            error: "Erro desconhecido" 
+        return res.status(500).json({
+            message: "Erro ao registrar serviços",
+            error: "Erro desconhecido"
         });
     }
 };
@@ -109,7 +109,6 @@ export const cadastrarTipoServico = async (req: Request, res: Response) => {
                     });
                 }
 
-                // Create if doesn't exist
                 return prisma.tipoServico.create({
                     data: {
                         id_tipo_servico: tipo.id_tipo_servico,
@@ -126,14 +125,14 @@ export const cadastrarTipoServico = async (req: Request, res: Response) => {
         });
     } catch (error) {
         if (error instanceof Error) {
-            return res.status(500).json({ 
-                message: "Erro ao registrar tipos de serviço", 
-                error: error.message 
+            return res.status(500).json({
+                message: "Erro ao registrar tipos de serviço",
+                error: error.message
             });
         }
-        return res.status(500).json({ 
-            message: "Erro ao registrar tipos de serviço", 
-            error: "Erro desconhecido" 
+        return res.status(500).json({
+            message: "Erro ao registrar tipos de serviço",
+            error: "Erro desconhecido"
         });
     }
 };

@@ -118,4 +118,5 @@ userRouter.post("/cadastro", cadastroUsuario)
  */
 userRouter.get("/me", getUserInfo)
 
+
 export default userRouter;

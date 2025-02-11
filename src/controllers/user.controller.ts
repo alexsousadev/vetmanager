@@ -54,6 +54,8 @@ export async function getUserInfo(req: Request, res: Response) {
   }
 
 }
+
+
 // cadastro de usuario
 export async function cadastroUsuario(req: Request, res: Response) {
   try {

@@ -1,6 +1,6 @@
-import { Request, Response } from "express";
 import { prisma } from "../services/database.service";
 import { z, ZodError } from "zod";
+import { Request, Response } from "express";
 
 const clinicaCadastroSchema = z.object({
     id_clinica: z.number(),
@@ -155,47 +155,42 @@ const servicoClinicaSchema = z.object({
     nome_tipo_servico: z.string().optional()
 });
 
-type ServicoClinicaSchema = z.infer<typeof servicoClinicaSchema>;
-
 export const servicosClinicaCategoria = async (idClinica: number) => {
     try {
-        // Busca todos os serviços da clínica
+        // Busca todos os serviços únicos da clínica
         const servicosClinica = await prisma.servicoClinica.findMany({
+            distinct: ['servicoId_servico'],
             where: {
-                clinicaId: idClinica
+                clinicaId: idClinica,
+                servicoId_servico: { not: null }
             }
         });
 
-        // Para cada serviço, busca o nome do tipo de serviço
-        const nomesServicos = await Promise.all(
+        // Para cada serviço, busca o nome e os trabalhos relacionados
+        const servicosComTrabalhos = await Promise.all(
             servicosClinica.map(async (servico) => {
-                // Encontra o tipo de serviço
-                const tipoServico = await prisma.servico.findUnique({
+                const servicoInfo = await prisma.servico.findUnique({
                     where: {
                         id_servico: servico.servicoId_servico ?? undefined
                     }
                 });
 
-                if (!tipoServico) {
-                    throw new Error(`Tipo de serviço não encontrado para o ID: ${servico.servicoId_servico}`);
+                if (!servicoInfo) {
+                    throw new Error(`Serviço não encontrado para o ID: ${servico.servicoId_servico}`);
                 }
 
-                const tipoTrabalhoServico = await servicoTrabalhoClinica(idClinica, tipoServico?.id_servico);
+                // Busca os trabalhos relacionados ao serviço
+                const trabalhos = await servicoTrabalhoClinica(idClinica, servicoInfo.id_servico);
 
-
-                if (!tipoServico) {
-                    throw new Error(`Tipo de serviço não encontrado para o ID: ${servico.servicoId_servico}`);
-                }
-
-                // Retorna o nome do tipo de serviço
-                return { id_servico: tipoServico.id_servico, nome_servico: tipoServico.nome_servico, trabalho: tipoTrabalhoServico }
+                return {
+                    id_servico: servicoInfo.id_servico,
+                    nome_servico: servicoInfo.nome_servico,
+                    trabalhos: trabalhos
+                };
             })
         );
 
-        // Remove duplicatas (se necessário)
-        const nomesUnicos = [...new Set(nomesServicos)];
-
-        return nomesUnicos; // Retorna um array com os nomes dos serviços únicos
+        return servicosComTrabalhos;
     } catch (error) {
         console.error("Erro ao listar serviços da clínica:", error);
         return null;
@@ -204,9 +199,12 @@ export const servicosClinicaCategoria = async (idClinica: number) => {
 
 
 // retorna serviços da clinica
-export const servicoTrabalhoClinica = async (idClinica: number, servicoId: number): Promise<Array<{ id_servico: number, nome_servico: string, trabalho: string }>> => {
-    let trabalhosServicos: Array<{ id_servico: number, nome_servico: string, trabalho: string }> = [];
+export const servicoTrabalhoClinica = async (idClinica: number, servicoId: number | null): Promise<Array<{ id_trabalho: number, nome_trabalho: string }>> => {
+    let trabalhosServicos: Array<{ id_trabalho: number, nome_trabalho: string }> = [];
     try {
+        if (servicoId === null) {
+            return [];
+        }
         // Busca todos os serviços da clínica
         const tarefasServicosClinica = await prisma.servicoClinica.findMany({
             where: {
@@ -231,9 +229,8 @@ export const servicoTrabalhoClinica = async (idClinica: number, servicoId: numbe
 
             if (servico.servicoId_servico == servicoId) {
                 trabalhosServicos.push({
-                    id_servico: tipoServico.id_tipo_servico,
-                    nome_servico: tipoServico.nome_tipo,
-                    trabalho: tipoServico.nome_tipo
+                    id_trabalho: tipoServico.id_tipo_servico,
+                    nome_trabalho: tipoServico.nome_tipo
                 });
             }
 
@@ -364,7 +361,15 @@ export const cadastroLocalizacao = async (req: Request, res: Response) => {
         return res.status(201).json({ message: "Localizações cadastradas com sucesso", localizacoes: localizacoesCadastradas });
     } catch (error) {
         console.error("Erro ao cadastrar localizações:", error);
-        return res.status(500).json({ message: "Erro ao cadastrar localizações" });
+        if (error instanceof ZodError) {
+            return res.status(400).json({
+                error: error.errors,
+            });
+        }
+        return res.status(500).json({
+            message: "Erro ao cadastrar localizações",
+            error: error instanceof Error ? error.message : String(error)
+        });
     }
 };
 
@@ -373,7 +378,6 @@ export const atualizarClinica = async (req: Request, res: Response) => {
         const { id } = req.params;
         const {
             nome_clinica,
-            endereco_clinica,
             telefone_clinica,
             foto_clinica,
             avaliacao_clinica,

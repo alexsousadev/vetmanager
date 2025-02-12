@@ -188,7 +188,7 @@ export const servicosClinicaCategoria = async (idClinica: number) => {
                 }
 
                 // Retorna o nome do tipo de serviço
-                return { nome_servico: tipoServico.nome_servico, trabalho: tipoTrabalhoServico }
+                return { id_servico: tipoServico.id_servico, nome_servico: tipoServico.nome_servico, trabalho: tipoTrabalhoServico }
             })
         );
 
@@ -204,8 +204,8 @@ export const servicosClinicaCategoria = async (idClinica: number) => {
 
 
 // retorna serviços da clinica
-export const servicoTrabalhoClinica = async (idClinica: number, servicoId: number): Promise<string[]> => {
-    let trabalhosServicos: string[] = [];
+export const servicoTrabalhoClinica = async (idClinica: number, servicoId: number): Promise<Array<{ id_servico: number, nome_servico: string, trabalho: string }>> => {
+    let trabalhosServicos: Array<{ id_servico: number, nome_servico: string, trabalho: string }> = [];
     try {
         // Busca todos os serviços da clínica
         const tarefasServicosClinica = await prisma.servicoClinica.findMany({
@@ -230,7 +230,11 @@ export const servicoTrabalhoClinica = async (idClinica: number, servicoId: numbe
             }
 
             if (servico.servicoId_servico == servicoId) {
-                trabalhosServicos.push(tipoServico?.nome_tipo);
+                trabalhosServicos.push({
+                    id_servico: tipoServico.id_tipo_servico,
+                    nome_servico: tipoServico.nome_tipo,
+                    trabalho: tipoServico.nome_tipo
+                });
             }
 
         }));

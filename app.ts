@@ -1,7 +1,6 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import userRoutes from './src/routes/user.routes';
-import path from 'path';
 import routesClinicas from './src/routes/clinica.routes';
 import Pet_routes from './src/routes/pet.routes';
 import { EnvConfig } from './src/services/env.service';
@@ -53,7 +52,6 @@ app.use(cors());
 app.use(express.json());
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, 'public')));
 
 app.use("/clinicas", routesClinicas);
 app.use("/users", userRoutes);

@@ -257,4 +257,65 @@ const detalharAgendamento = async (req: Request, res: Response) => {
     }
 };
 
-export { agendarConsulta, criarAgendamento, listarAgendamentos, detalharAgendamento };
+const deletarAgendamentoConsulta = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+
+        if (!id || isNaN(Number(id))) {
+            if (!res.headersSent) {
+                return res.status(400).json({
+                    message: "ID do agendamento inválido"
+                });
+            }
+            return;
+        }
+
+        const idUsuario = await getIdOfToken(req, res);
+        if (!idUsuario) {
+            if (!res.headersSent) {
+                return res.status(401).json({
+                    message: "Usuário não autenticado ou token inválido."
+                });
+            }
+            return;
+        }
+
+        const agendamento = await prisma.agendamento.findFirst({
+            where: {
+                AND: [
+                    { id_agendamento: Number(id) },
+                    { id_usuario: parseInt(idUsuario) }
+                ]
+            }
+        });
+
+        if (!agendamento) {
+            if (!res.headersSent) {
+                return res.status(404).json({
+                    message: "Agendamento não encontrado ou não pertence ao usuário!"
+                });
+            }
+            return;
+        }
+
+        await prisma.agendamento.update({
+            where: { id_agendamento: Number(id) },
+            data: { status_agendamento: "CANCELADO" }
+        });
+
+        if (!res.headersSent) {
+            return res.status(200).json({
+                message: "Agendamento cancelado com sucesso"
+            });
+        }
+    } catch (error) {
+        console.error("Erro ao cancelar agendamento:", error);
+        if (!res.headersSent) {
+            return res.status(500).json({
+                message: "Erro ao cancelar agendamento."
+            });
+        }
+    }
+};
+
+export { agendarConsulta, criarAgendamento, listarAgendamentos, detalharAgendamento, deletarAgendamentoConsulta };

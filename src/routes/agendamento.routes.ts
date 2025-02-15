@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { agendarConsulta, detalharAgendamento, listarAgendamentos } from "../controllers/agendamento.controller";
+import { agendarConsulta, detalharAgendamento, listarAgendamentos, deletarAgendamentoConsulta } from "../controllers/agendamento.controller";
 
 export const agendamentoRoutes = Router();
 
@@ -167,5 +167,40 @@ agendamentoRoutes.get("/", listarAgendamentos);
  *         description: Erro ao buscar detalhes do agendamento. Consulte os logs do servidor para mais detalhes.
  */
 agendamentoRoutes.get("/:id", detalharAgendamento);
+
+/**
+ * @swagger
+ * /agendamentos/{id}/cancelar:
+ *   patch:
+ *     summary: Cancelar um agendamento específico
+ *     tags: [Agendamento]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: ID do agendamento
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Agendamento cancelado com sucesso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Agendamento'
+ *       401:
+ *         description: Não autenticado, token JWT ausente ou inválido.
+ *       403:
+ *         description: Não autorizado a cancelar este agendamento
+ *       404:
+ *         description: Agendamento não encontrado ou não pertence ao usuário!
+ *       422:
+ *         description: Não é possível cancelar um agendamento que já foi realizado ou já está cancelado
+ *       500:
+ *         description: Erro ao cancelar agendamento. Consulte os logs do servidor para mais detalhes.
+ */
+agendamentoRoutes.patch("/:id/cancelar", deletarAgendamentoConsulta);
 
 export default agendamentoRoutes;
